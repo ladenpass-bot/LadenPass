@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 # --- 1. PAGE CONFIGURATION ---
 st.set_page_config(
@@ -12,30 +11,35 @@ st.set_page_config(
 # --- 2. FAIL-SAFE STYLING (CSS) ---
 st.markdown("""
     <style>
-    /* --- MAIN PAGE BACKGROUND --- */
+    /* 1. FORCE MAIN BACKGROUND TO WHITE */
     .stApp {
         background-color: #ffffff !important;
     }
 
-    /* --- SIDEBAR STYLING --- */
+    /* 2. FORCE SIDEBAR BACKGROUND TO BRAND GREEN */
     [data-testid="stSidebar"] {
-        background-color: #0e3b28 !important; /* Brand Green */
+        background-color: #0e3b28 !important; /* Deep Green from Logo */
         border-right: 1px solid #064e3b;
     }
-    
-    /* --- TEXT COLOR CORRECTION --- */
-    /* Force all headings and text on the main page to be Dark Blue */
-    .main h1, .main h2, .main h3, .main h4, .main p, .main li, .main span, .main div {
+
+    /* 3. FIX TEXT VISIBILITY (The Critical Fix) */
+    /* Force all main page text to be Dark Blue/Black */
+    .main h1, .main h2, .main h3, .main h4, .main p, .main li, .main span, .main div, .main label {
         color: #0f172a !important;
     }
     
-    /* Force Sidebar text to be White */
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] div, [data-testid="stSidebar"] label {
+    /* Force specific overrides for Streamlit containers that might try to be white */
+    div[data-testid="stVerticalBlock"] > div > div {
+        color: #0f172a !important;
+    }
+
+    /* 4. SIDEBAR TEXT (White) */
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] div, [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stRadio div {
         color: #ffffff !important;
     }
 
-    /* --- FEATURE CARD SPECIFIC FIX --- */
-    /* This fixes the invisible text in the boxes */
+    /* 5. FEATURE CARDS (Grey Box with Dark Text) */
     .feature-card {
         background-color: #f1f5f9;
         padding: 20px;
@@ -45,24 +49,24 @@ st.markdown("""
         margin-bottom: 10px;
     }
     .feature-card h3 {
-        color: #0f172a !important; /* Force Title Black */
+        color: #0f172a !important;
         margin-top: 0;
     }
     .feature-card p {
-        color: #475569 !important; /* Force Text Dark Grey */
+        color: #475569 !important;
     }
 
-    /* --- INPUT FIELDS --- */
+    /* 6. INPUT FIELDS (White Background, Dark Text) */
     .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div {
         background-color: #ffffff !important;
         color: #0f172a !important;
         border: 1px solid #cbd5e1;
     }
     
-    /* --- BUTTONS --- */
+    /* 7. BUTTONS (Green Accent) */
     .stButton>button {
         width: 100%;
-        background-color: #22c55e !important;
+        background-color: #22c55e !important; /* Light Green from Logo */
         color: white !important;
         border: none;
         padding: 0.6rem 1rem;
@@ -71,7 +75,7 @@ st.markdown("""
     }
     .stButton>button:hover { background-color: #16a34a !important; }
 
-    /* --- HIDE MENU --- */
+    /* 8. HIDE DEFAULT MENUS */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -80,18 +84,13 @@ st.markdown("""
 
 # --- 3. SIDEBAR NAVIGATION ---
 with st.sidebar:
-    # --- LOGO REPLACEMENT ---
-    # Since the image link was breaking, we use this professional text header.
-    # It renders reliable branding instantly.
-    st.markdown("""
-        <div style="text-align: left; margin-bottom: 20px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 2.5rem;">🛡️</span>
-                <span style="font-size: 1.8rem; font-weight: 800; color: white; letter-spacing: -1px;">LadenPass</span>
-            </div>
-            <p style="color: #86efac !important; margin-top: -5px; font-size: 0.9rem; margin-left: 5px;">Enterprise Logistics</p>
-        </div>
-    """, unsafe_allow_html=True)
+    # LOGO: This looks for "logo.jpg" in your GitHub root folder.
+    # If the image is broken, check the spelling in your GitHub repo exactly.
+    try:
+        st.image("logo.jpg", use_container_width=True)
+    except:
+        # Fallback if image fails to load
+        st.error("Logo not found. Please upload 'logo.jpg' to GitHub.")
     
     st.markdown("---")
     menu = st.radio("Navigation", ["🏠 Home", "🛠️ Start Assessment", "🚛 My Fleet"])
@@ -142,7 +141,7 @@ if menu == "🏠 Home":
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # CTA
+    # CALL TO ACTION
     col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
     with col_cta2:
         st.info("👈 Select 'Start Assessment' in the sidebar to begin.")
@@ -183,7 +182,7 @@ elif menu == "🛠️ Start Assessment":
             status = "Referral"
             color = "#ef4444" # Red
             
-        # RESULTS
+        # RESULTS CARD
         st.markdown("---")
         r1, r2 = st.columns(2)
         with r1:
@@ -194,7 +193,6 @@ elif menu == "🛠️ Start Assessment":
         if len(flags) == 0: flags.append("✅ General Access Compliant")
         html_flags = "".join([f"<li>{f}</li>" for f in flags])
         
-        # Result Card
         st.markdown(f"""
         <div style="background-color: white; padding: 20px; border-left: 6px solid {color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 20px;">
             <h4 style="margin:0; color: #0f172a !important;">Analysis Details</h4>
