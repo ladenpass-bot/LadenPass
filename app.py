@@ -1,189 +1,240 @@
 import streamlit as st
-import datetime
 import time
 import pandas as pd
+import datetime
 
-# --- APP CONFIGURATION ---
+# --- 1. PAGE CONFIGURATION (Must be first) ---
 st.set_page_config(
-    page_title="LadenPass | Automated Access",
+    page_title="LadenPass | Enterprise Logistics",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CUSTOM CSS (THE "FACELESS" BRANDING) ---
-# This makes it look like expensive software, not a basic script.
+# --- 2. PROFESSIONAL STYLING (CSS) ---
+# This hides the 'Streamlit' branding and adds a corporate skin.
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    h1 { color: #0f172a; font-family: 'Helvetica Neue', sans-serif; }
-    .stButton>button { 
-        width: 100%; 
-        background-color: #0056b3; 
-        color: white; 
-        border-radius: 5px; 
-        height: 3em; 
-        font-weight: bold;
+    /* Main Background */
+    .stApp {
+        background-color: #f4f6f9;
     }
-    .stButton>button:hover { background-color: #004494; border-color: #004494; }
-    .metric-card {
+    /* Hide Streamlit Header/Footer */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+    /* Custom Header Styling */
+    h1 {
+        font-family: 'Helvetica Neue', sans-serif;
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 2.2rem;
+    }
+    h2, h3 {
+        font-family: 'Helvetica Neue', sans-serif;
+        color: #334155;
+    }
+    
+    /* Card Styling for Results */
+    .result-card {
         background-color: white;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        text-align: center;
+        border-left: 5px solid #3b82f6;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
     }
-    .highlight { color: #e11d48; font-weight: bold; }
-    .success-box { padding: 15px; background-color: #d1fae5; color: #065f46; border-radius: 8px; border: 1px solid #34d399; }
-    .warning-box { padding: 15px; background-color: #ffedd5; color: #9a3412; border-radius: 8px; border: 1px solid #fb923c; }
+    
+    /* Button Styling */
+    .stButton>button {
+        width: 100%;
+        background-color: #0f172a; /* Navy Blue */
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .stButton>button:hover {
+        background-color: #1e293b;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    /* Status Indicators */
+    .status-dot {
+        height: 10px;
+        width: 10px;
+        background-color: #22c55e;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR NAVIGATION ---
+# --- 3. SIDEBAR NAVIGATION ---
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/1584/1584892.png", width=50) # Placeholder Icon
-    st.markdown("## **LadenPass**")
-    st.markdown("### *Invisible Compliance*")
-    st.markdown("---")
-    menu = st.radio("Menu", ["New Assessment", "Driver Logs (July '26)", "My Fleet", "Admin Settings"])
+    st.markdown("## **🛡️ LadenPass**")
+    st.caption("Ver 2.1.0 (Enterprise)")
     
     st.markdown("---")
-    st.info("**System Status:** \n\n🟢 **HVSAPS API:** Online\n\n🟢 **NHVR Portal:** Connected")
-    st.markdown("v1.2 (Jan 2026 Build)")
-
-# --- MAIN PAGE LOGIC ---
-
-if menu == "New Assessment":
-    col1, col2 = st.columns([2, 1])
     
-    with col1:
-        st.title("🚛 New Movement Assessment")
-        st.write("Enter vehicle specifications to check against **2026 HVSAPS** & **Gazette Notices**.")
-        
-        with st.form("assessment_form"):
-            st.write("### 1. Machine Details")
-            c1, c2, c3 = st.columns(3)
+    # Navigation
+    menu = st.radio("Module", ["🔍 Route Assessment", "🚛 Fleet Manager", "📂 Permit Archive", "⚙️ Settings"])
+    
+    st.markdown("---")
+    
+    # "Live" Status Mockup
+    st.markdown("### **System Status**")
+    st.markdown('<div><span class="status-dot"></span><strong>NHVR Portal API</strong>: Online</div>', unsafe_allow_html=True)
+    st.markdown('<div><span class="status-dot"></span><strong>HVSAPS (VIC/NSW)</strong>: Online</div>', unsafe_allow_html=True)
+    st.markdown('<div><span class="status-dot"></span><strong>Gazette Database</strong>: Synced</div>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.info("ℹ️ **Support:** 1800 555 000\n\nadmin@ladenpass.com.au")
+
+# --- 4. MAIN CONTENT LOGIC ---
+
+if menu == "🔍 Route Assessment":
+    # Header
+    col_head1, col_head2 = st.columns([3, 1])
+    with col_head1:
+        st.title("Compliance Engine")
+        st.markdown("**New Movement Assessment (Class 1 OSOM)**")
+    with col_head2:
+        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Infobox_info_icon.svg/480px-Infobox_info_icon.svg.png", width=40)
+        st.caption("2026 Regulations Active")
+
+    # The Input Dashboard
+    with st.container():
+        st.markdown("### 1. Vehicle Configuration")
+        with st.expander("📝 Enter Load Details", expanded=True):
+            c1, c2, c3, c4 = st.columns(4)
             with c1:
-                ref_id = st.text_input("Job Reference", value="JOB-2026-001")
+                ref = st.text_input("Job Reference", value="JOB-26-004")
             with c2:
-                machine_type = st.selectbox("Load Type", ["Excavator", "Dozer", "Crane", "Ag Machinery", "Structure"])
+                make = st.selectbox("Configuration", ["Prime Mover + Low Loader", "Crane (All Terrain)", "Platform Trailer"])
             with c3:
-                route_state = st.selectbox("Jurisdiction", ["Victoria", "NSW", "QLD", "SA"])
-
-            st.write("### 2. Dimensions & Mass")
-            c4, c5, c6, c7 = st.columns(4)
+                gcm = st.number_input("GCM (Tonnes)", 10.0, 200.0, 42.5, step=0.5)
             with c4:
-                length = st.number_input("Length (m)", 10.0, 30.0, 19.0)
+                route = st.selectbox("Jurisdiction", ["Victoria", "NSW", "Queensland", "South Australia"])
+
+            c5, c6, c7, c8 = st.columns(4)
             with c5:
-                width = st.number_input("Width (m)", 2.0, 6.0, 2.5)
+                length = st.number_input("Length (m)", 10.0, 40.0, 19.0)
             with c6:
-                height = st.number_input("Height (m)", 2.0, 6.0, 4.3)
+                width = st.number_input("Width (m)", 2.0, 8.0, 2.5)
             with c7:
-                mass = st.number_input("Total Mass (t)", 10.0, 150.0, 42.0)
+                height = st.number_input("Height (m)", 2.0, 6.0, 4.3)
+            with c8:
+                axles = st.number_input("Total Axles", 2, 20, 6)
 
-            st.write("### 3. Route Configuration")
-            hvsaps_check = st.checkbox("Run HVSAPS Structural Check (VIC/NSW)", value=True)
-            
-            submitted = st.form_submit_button("Run Compliance Engine")
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Action Button
+    assess_btn = st.button("RUN COMPLIANCE CHECK (HVSAPS)")
 
-    if submitted:
-        with st.spinner("Connecting to NHVR 2026 Gazette Database..."):
-            time.sleep(1.5) # Simulate API latency for "realism"
+    # The Logic Engine
+    if assess_btn:
+        # Simulate Processing
+        with st.spinner("Querying NHVR Gazette Notices..."):
+            time.sleep(0.8)
+        with st.spinner("Running HVSAPS Structural Analysis (DTP API)..."):
+            time.sleep(1.2)
+
+        # Logic
+        flags = []
+        status = "Approved"
+        color = "green"
         
-        st.markdown("---")
-        st.subheader(f"📋 Compliance Report: {ref_id}")
-
-        # --- THE LOGIC BRAIN (Proprietary Engine) ---
-        issues = []
-        fees = 91.00
+        # 1. HVSAPS Check (The 2026 Feature)
+        if gcm > 42.5 and (route == "Victoria" or route == "NSW"):
+            flags.append("🌉 **HVSAPS ALERT:** Mass > 42.5t. Structural bridge assessment required.")
+            status = "Conditional"
+            color = "orange"
         
-        # Logic 1: Width (Oversize)
+        # 2. Dimensions
         if width > 2.5:
-            issues.append("⚠️ **OVERSIZE:** Width exceeds 2.5m General Access limit.")
+            flags.append("⚠️ **OVERSIZE:** Width exceeds General Access (2.5m).")
+            status = "Conditional" if status != "Critical" else "Critical"
+            color = "orange"
         
-        # Logic 2: Height (Electric/Rail)
         if height > 4.3:
-            issues.append("⚠️ **HIGH LOAD:** Height exceeds 4.3m. Route restricted.")
+            flags.append("⚠️ **HIGH LOAD:** Height exceeds General Access (4.3m).")
+            color = "orange"
+        
         if height > 4.9:
-            issues.append("🚨 **RAIL CLEARANCE:** Height > 4.9m. Automated RIM notification required.")
-        if height > 5.2:
-            issues.append("⚡ **POWER UTILITY:** Height > 5.2m. Essential Energy clearance required.")
+            flags.append("⚡ **UTILITY CLEARANCE:** Height > 4.9m. Essential Energy/Rail check mandatory.")
+            status = "Referral Required"
+            color = "red"
 
-        # Logic 3: Mass (HVSAPS Trigger - The 2026 Feature)
-        if mass > 42.5 and (route_state == "Victoria" or route_state == "NSW"):
-             issues.append("🌉 **HVSAPS TRIGGERED:** Mass > 42.5t. Automated bridge assessment initiated.")
-
-        # --- RESULTS DISPLAY ---
+        # Results Display
+        st.markdown("---")
+        st.subheader("📋 Assessment Results")
+        
         r1, r2, r3 = st.columns(3)
-        
         with r1:
-            if not issues:
-                st.markdown("<div class='success-box'><h3>✅ PASS</h3><p>General Access - No Permit Required</p></div>", unsafe_allow_html=True)
-            elif any("RAIL" in i for i in issues) or any("POWER" in i for i in issues):
-                 st.markdown("<div class='warning-box'><h3>🔴 CRITICAL</h3><p>Utility/Rail Clearance Required</p></div>", unsafe_allow_html=True)
-            else:
-                 st.markdown("<div class='warning-box'><h3>🟠 CONDITIONAL</h3><p>Class 1 Permit Required</p></div>", unsafe_allow_html=True)
-
+            st.metric("Determination", status, delta="Action Required" if color != "green" else "Clear", delta_color="inverse" if color=="red" else "normal")
         with r2:
-            st.metric("Est. Gov Fees", f"${fees:.2f}")
-        
+            st.metric("NHVR Fee", "$91.00", "Statutory")
         with r3:
-            st.metric("Processing Time", "Instant" if not issues else "24-48 Hours")
+            st.metric("Turnaround", "Instant" if color == "green" else "24 Hours")
 
-        st.write("### Action Items")
-        if issues:
-            for issue in issues:
-                st.write(issue)
-            
-            st.write("---")
-            st.write("**Ready to file?**")
-            col_pay, col_info = st.columns([1,2])
-            with col_pay:
-                st.button(f"🚀 File Application (${fees + 49}0)") # Adds your $49 service fee
-            with col_info:
-                st.caption("Includes automated HVSAPS bridge check & NHVR submission fee.")
-        else:
-            st.success("This load is General Access. No permit required. Safe travels!")
+        # The "Card" for details
+        st.markdown(f"""
+        <div class="result-card" style="border-left-color: {'#ef4444' if color=='red' else '#f59e0b' if color=='orange' else '#22c55e'};">
+            <h4>Analysis Details</h4>
+            <ul>
+                {''.join([f'<li>{f}</li>' for f in flags]) if flags else '<li>✅ Vehicle is General Access compliant. No permit required.</li>'}
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
 
-elif menu == "Driver Logs (July '26)":
-    st.title("📱 Primary Duty Log")
-    st.info("Required under July 2026 HVNL Amendments for all Class 1 movements.")
+        # Call to Action
+        if color != "green":
+            col_cta1, col_cta2 = st.columns([1, 2])
+            with col_cta1:
+                st.button("🚀 SUBMIT APPLICATION ($91 + $49 Fee)")
+            with col_cta2:
+                st.info("Clicking submit will auto-fill the NHVR application and append the HVSAPS report.")
+
+elif menu == "🚛 Fleet Manager":
+    st.title("Fleet Registry")
+    st.markdown("Manage your assets for rapid permitting.")
     
-    with st.form("driver_log"):
-        st.write("**Driver Self-Assessment**")
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.text_input("Driver Name")
-            st.text_input("License Number")
-        with col_b:
-            st.selectbox("Fatigue Status", ["Standard Hours", "BFM", "AFM"])
-            st.selectbox("Current Location", ["Depot Start", "Rest Stop", "border Crossing"])
-        
-        st.write("**Fit-to-Drive Checklist**")
-        st.checkbox("I am not under the influence of drugs or alcohol.")
-        st.checkbox("I am not suffering from fatigue affecting my ability to drive.")
-        st.checkbox("I have visually inspected the load restraints.")
-        
-        st.form_submit_button("Sign & Upload Log")
-
-elif menu == "My Fleet":
-    st.title("🚛 My Fleet")
-    st.write("Manage stored vehicle profiles for one-click assessments.")
-    
-    # Mock Data Table
+    # Professional Table
     data = {
-        "Machine ID": ["PC300-1", "D8T-DOZER", "CRANE-50T"],
-        "Make": ["Komatsu", "Caterpillar", "Liebherr"],
-        "Mass (t)": [32.5, 48.0, 52.0],
-        "Width (m)": [3.2, 3.8, 2.9],
-        "Status": ["Active", "Active", "Maintenance"]
+        "Asset ID": ["PM-001", "TR-LOW-04", "CR-50T"],
+        "Registration": ["XQ-99-ZZ", "TR-88-AA", "HV-55-CC"],
+        "Make/Model": ["Kenworth K200", "Drake 4x4", "Liebherr LTM"],
+        "Status": ["Active", "Active", "Maintenance"],
+        "Last Permit": ["2 days ago", "Yesterday", "N/A"]
     }
     df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, use_container_width=True, hide_index=True)
+    
+    st.button("+ Add New Asset")
 
-elif menu == "Admin Settings":
-    st.title("⚙️ Admin Console")
-    st.write("Manage your API keys and billing.")
-    st.text_input("NHVR Portal API Key", type="password")
-    st.text_input("Stripe Secret Key", type="password")
-    st.button("Save Configuration")
+elif menu == "📂 Permit Archive":
+    st.title("Permit Library")
+    st.warning("Please log in to view historical documents.")
+
+elif menu == "⚙️ Settings":
+    st.title("System Configuration")
+    st.text_input("Company Name", value="LadenPass Demo Account")
+    st.text_input("NHVR Portal Email")
+    st.text_input("API Key (Hidden)", type="password")
+    st.button("Save Changes")
+
+# --- 5. PROFESSIONAL FOOTER ---
+st.markdown("---")
+st.markdown(
+    """
+    <div style='text-align: center; color: #64748b; font-size: 0.8rem;'>
+        © 2026 LadenPass Technologies. All rights reserved. <br>
+        Built for compliance with the <strong>Heavy Vehicle National Law (HVNL)</strong> and <strong>HVSAPS 2026</strong> standards.<br>
+        <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Status</a>
+    </div>
+    """, unsafe_allow_html=True
+)
