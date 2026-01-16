@@ -9,49 +9,59 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. THE VISIBILITY FIX (CSS) ---
+# --- 2. PROFESSIONAL BRANDING (CSS) ---
 st.markdown("""
     <style>
-    /* 1. FORCE MAIN PAGE TO BE WHITE */
+    /* 1. MAIN PAGE BACKGROUND (Keep White) */
     .stApp {
         background-color: #ffffff !important;
     }
     
-    /* 2. FORCE SIDEBAR TO BE WHITE */
+    /* 2. SIDEBAR BACKGROUND (The "LadenPass Green") */
     [data-testid="stSidebar"] {
-        background-color: #f8fafc !important;
-        border-right: 1px solid #e2e8f0;
+        background-color: #0e3b28 !important; /* Deep Forest Green */
+        border-right: 1px solid #064e3b;
     }
 
-    /* 3. FORCE ALL TEXT TO BE DARK (Main + Sidebar) */
-    h1, h2, h3, h4, h5, h6, p, li, span, div, label, .stMarkdown {
+    /* 3. SIDEBAR TEXT (Force White for Readability) */
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] div, 
+    [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stMarkdown {
+        color: #ffffff !important;
+    }
+
+    /* 4. MAIN PAGE TEXT (Keep Dark Blue/Black) */
+    .main h1, .main h2, .main h3, .main h4, .main h5, .main h6, 
+    .main p, .main li, .main span, .main div, .main label {
         color: #0f172a !important;
     }
 
-    /* 4. FIX INPUT FIELDS (So you can see what you type) */
+    /* 5. INPUT FIELDS (Clean White) */
     .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div {
         background-color: #ffffff !important;
         color: #0f172a !important;
         border: 1px solid #cbd5e1;
     }
     
-    /* 5. HIDE DEFAULT STREAMLIT MENU */
+    /* 6. HIDE STREAMLIT BRANDING */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* 6. BUTTON STYLING */
+    /* 7. BUTTON STYLING (Bright Accent Green) */
     .stButton>button {
         width: 100%;
-        background-color: #047857 !important; /* Green */
+        background-color: #22c55e !important; /* Bright Logo Green */
         color: white !important;
         border: none;
         padding: 0.6rem 1rem;
         border-radius: 8px;
+        font-weight: bold;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
-    .stButton>button:hover { background-color: #065f46 !important; }
+    .stButton>button:hover { background-color: #16a34a !important; }
 
-    /* 7. CARD STYLING */
+    /* 8. FEATURE CARDS */
     .feature-card {
         background-color: #f1f5f9;
         padding: 20px;
@@ -65,7 +75,7 @@ st.markdown("""
 
 # --- 3. SIDEBAR NAVIGATION ---
 with st.sidebar:
-    # Looking for 'logo.jpeg'
+    # Ensure this file name matches exactly what is in your GitHub
     st.image("https://raw.githubusercontent.com/ladenpass-bot/LadenPass/main/logo.jpeg", use_container_width=True)
     
     st.markdown("---")
@@ -80,7 +90,7 @@ if menu == "🏠 Home":
     # HERO SECTION
     st.markdown("""
     <div style="text-align: center; padding: 40px 0;">
-        <h1 style="font-size: 3rem;">Move Heavy Loads, <span style="color: #047857 !important;">Faster.</span></h1>
+        <h1 style="font-size: 3rem;">Move Heavy Loads, <span style="color: #16a34a !important;">Faster.</span></h1>
         <p style="font-size: 1.2rem; color: #475569 !important;">
             The automated compliance tool for Class 1 Heavy Vehicles. <br>
             Instant bridge checks. 100% Compliant.
@@ -88,7 +98,7 @@ if menu == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
-    # FEATURES (Fixed Line 93)
+    # FEATURES
     c1, c2, c3 = st.columns(3)
     
     with c1:
@@ -118,51 +128,4 @@ elif menu == "🛠️ Start Assessment":
         with c2:
             route = st.selectbox("Jurisdiction", ["Victoria", "NSW", "QLD", "SA"])
             width = st.number_input("Width (m)", 2.0, 8.0, 2.5)
-            height = st.number_input("Height (m)", 2.0, 6.0, 4.3)
-            
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    if st.button("RUN COMPLIANCE ENGINE"):
-        # LOGIC
-        flags = []
-        status = "Approved"
-        color = "#22c55e" # Green
-        
-        if gcm > 42.5:
-            flags.append("Mass > 42.5t (Bridge Check Req)")
-            status = "Conditional"
-            color = "#f59e0b" # Orange
-        if width > 2.5:
-            flags.append("Oversize Width (>2.5m)")
-            status = "Conditional"
-            color = "#f59e0b"
-        if height > 4.9:
-            flags.append("Height > 4.9m (Power Check)")
-            status = "Referral"
-            color = "#ef4444" # Red
-            
-        # RESULTS
-        st.markdown("---")
-        r1, r2 = st.columns(2)
-        with r1:
-            st.metric("Status", status)
-        with r2:
-            st.metric("NHVR Fee", "$91.00")
-            
-        if len(flags) == 0: flags.append("✅ General Access Compliant")
-        html_flags = "".join([f"<li>{f}</li>" for f in flags])
-        
-        st.markdown(f"""
-        <div style="background-color: white; padding: 20px; border-left: 6px solid {color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 20px;">
-            <h4 style="margin:0;">Analysis Details</h4>
-            <ul>{html_flags}</ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if color != "#22c55e":
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.link_button("🚀 SUBMIT APPLICATION ($140)", "https://buy.stripe.com/test_123")
-
-elif menu == "🚛 My Fleet":
-    st.title("My Fleet")
-    st.info("Log in to view your saved assets.")
+            height =
