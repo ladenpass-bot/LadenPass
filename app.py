@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import base64
+import datetime
 
 # --- 1. ENTERPRISE PAGE CONFIG ---
 st.set_page_config(
@@ -25,7 +26,7 @@ st.markdown("""
     <style>
     /* --- REMOVE TOP WHITESPACE (THE SCROLL FIX) --- */
     .block-container {
-        padding-top: 1rem !important; /* Reduces top gap significantly */
+        padding-top: 1rem !important;
         padding-bottom: 1rem !important;
     }
 
@@ -94,7 +95,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 20px;
         border-radius: 10px;
-        margin-bottom: 15px; /* Reduced margin */
+        margin-bottom: 15px;
         transition: transform 0.2s;
     }
     .glass-card:hover {
@@ -144,13 +145,21 @@ with st.sidebar:
     
     st.markdown("---")
     st.success("🟢 Online")
-    st.markdown("<div style='font-size: 0.8rem; opacity: 0.7;'>v2.4.0 Enterprise</div>", unsafe_allow_html=True)
+    
+    # --- COPYRIGHT SECTION ---
+    current_year = datetime.datetime.now().year
+    st.markdown(f"""
+        <div style='text-align: center; font-size: 0.8rem; color: #cbd5e1; margin-top: 15px; opacity: 0.8;'>
+            © {current_year} LadenPass Enterprise<br>
+            All Rights Reserved.
+        </div>
+    """, unsafe_allow_html=True)
 
 
 # --- 5. MAIN CONTENT ---
 
 if "Dashboard" in menu:
-    # HERO (Compacted)
+    # HERO (Compact)
     st.markdown("""
     <div style="text-align: center; padding: 10px 0 20px 0;">
         <h1 style="font-size: 3.5rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">LadenPass</h1>
@@ -167,7 +176,7 @@ if "Dashboard" in menu:
     with c3: st.markdown('<div class="glass-card"><h3>100%</h3><p>Compliant</p></div>', unsafe_allow_html=True)
     with c4: st.markdown('<div class="glass-card"><h3>24/7</h3><p>Uptime</p></div>', unsafe_allow_html=True)
 
-    # CAPABILITIES (Compact Layout)
+    # CAPABILITIES
     st.markdown("### Capabilities")
     fc1, fc2, fc3 = st.columns(3)
     
