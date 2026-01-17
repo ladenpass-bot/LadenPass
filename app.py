@@ -163,4 +163,44 @@ elif menu == "🛠️ Start Assessment":
         # LOGIC
         flags = []
         status = "Approved"
-        color = "#
+        color = "#22c55e" # Green
+        
+        if gcm > 42.5:
+            flags.append("Mass > 42.5t (Bridge Check Req)")
+            status = "Conditional"
+            color = "#f59e0b" # Orange
+        if width > 2.5:
+            flags.append("Oversize Width (>2.5m)")
+            status = "Conditional"
+            color = "#f59e0b"
+        if height > 4.9:
+            flags.append("Height > 4.9m (Power Check)")
+            status = "Referral"
+            color = "#ef4444" # Red
+            
+        # RESULTS CARD (Solid White for contrast)
+        st.markdown("---")
+        r1, r2 = st.columns(2)
+        with r1:
+            st.metric("Status", status)
+        with r2:
+            st.metric("NHVR Fee", "$91.00")
+            
+        if len(flags) == 0: flags.append("✅ General Access Compliant")
+        html_flags = "".join([f"<li>{f}</li>" for f in flags])
+        
+        # Result card stays white/opaque so it's easy to read the critical data
+        st.markdown(f"""
+        <div style="background-color: white; padding: 20px; border-left: 6px solid {color}; border-radius: 8px; margin-top: 20px;">
+            <h4 style="margin:0; color: #0f172a !important;">Analysis Details</h4>
+            <ul style="color: #0f172a !important;">{html_flags}</ul>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if color != "#22c55e":
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.link_button("🚀 SUBMIT APPLICATION ($140)", "https://buy.stripe.com/test_123")
+
+elif menu == "🚛 My Fleet":
+    st.title("My Fleet")
+    st.info("Log in to view your saved assets.")
