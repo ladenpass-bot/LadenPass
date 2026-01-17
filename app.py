@@ -24,13 +24,13 @@ logo_b64 = get_base64_image("logo.jpg")
 # --- 3. PROFESSIONAL STYLING (CSS) ---
 st.markdown("""
     <style>
-    /* --- REMOVE TOP WHITESPACE (THE SCROLL FIX) --- */
+    /* REMOVE TOP WHITESPACE */
     .block-container {
         padding-top: 1rem !important;
         padding-bottom: 1rem !important;
     }
 
-    /* --- GLOBAL THEME --- */
+    /* GLOBAL THEME */
     .stApp {
         background-color: #0f172a; 
         background-image: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), 
@@ -40,17 +40,17 @@ st.markdown("""
         background-attachment: fixed;
     }
 
-    /* --- TYPOGRAPHY --- */
+    /* TYPOGRAPHY */
     h1, h2, h3, h4, h5, h6 { color: #ffffff !important; margin-bottom: 5px !important; }
     p, li, label, span, div { color: #e2e8f0 !important; }
     
-    /* --- SIDEBAR --- */
+    /* SIDEBAR */
     [data-testid="stSidebar"] {
         background-color: #064e3b !important;
         border-right: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* --- LOGO CONTAINER --- */
+    /* LOGO CONTAINER */
     .logo-container {
         background-color: white;
         padding: 15px;
@@ -62,12 +62,9 @@ st.markdown("""
         align-items: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-    .logo-container img {
-        max-width: 100%;
-        height: auto;
-    }
+    .logo-container img { max-width: 100%; height: auto; }
 
-    /* --- NAVIGATION BUTTONS --- */
+    /* NAVIGATION BUTTONS */
     [data-testid="stRadio"] > div { gap: 10px; }
     [data-testid="stRadio"] label {
         background-color: rgba(255, 255, 255, 0.1) !important;
@@ -88,7 +85,7 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* --- COMPACT GLASS CARDS --- */
+    /* COMPACT GLASS CARDS */
     .glass-card {
         background-color: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(12px);
@@ -105,7 +102,7 @@ st.markdown("""
     .glass-card h3 { font-size: 1.5rem !important; margin: 0 !important; }
     .glass-card p { font-size: 0.9rem !important; margin: 0 !important; opacity: 0.8; }
 
-    /* --- INPUTS & BUTTONS --- */
+    /* INPUTS & BUTTONS */
     .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
         background-color: #ffffff !important;
         color: #0f172a !important;
@@ -124,12 +121,30 @@ st.markdown("""
         padding: 0.6rem;
     }
     .stButton > button:hover { background-color: #16a34a !important; }
+
+    /* DATA EDITOR (The Spreadsheet Look) */
+    [data-testid="stDataEditor"] {
+        background-color: white;
+        border-radius: 10px;
+        padding: 10px;
+    }
     
     #MainMenu, footer, header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. SIDEBAR CONTENT ---
+# --- 4. SESSION STATE (DATABASE) ---
+# This simulates a database so edits persist while clicking around
+if "fleet_df" not in st.session_state:
+    st.session_state.fleet_df = pd.DataFrame({
+        "Asset ID": ["PM-104", "PM-105", "TR-882"],
+        "Type": ["Prime Mover", "Prime Mover", "Low Loader"],
+        "GVM Rating": ["26.5t", "32.0t", "45.0t"],
+        "Status": ["Active", "Maintenance", "Active"],
+        "Rego Expiry": ["2026-10-12", "2026-08-01", "2026-12-15"]
+    })
+
+# --- 5. SIDEBAR CONTENT ---
 with st.sidebar:
     if logo_b64:
         st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}"></div>""", unsafe_allow_html=True)
@@ -146,7 +161,6 @@ with st.sidebar:
     st.markdown("---")
     st.success("🟢 Online")
     
-    # --- COPYRIGHT SECTION ---
     current_year = datetime.datetime.now().year
     st.markdown(f"""
         <div style='text-align: center; font-size: 0.8rem; color: #cbd5e1; margin-top: 15px; opacity: 0.8;'>
@@ -156,10 +170,10 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 
-# --- 5. MAIN CONTENT ---
+# --- 6. MAIN CONTENT ---
 
 if "Dashboard" in menu:
-    # HERO (Compact)
+    # HERO
     st.markdown("""
     <div style="text-align: center; padding: 10px 0 20px 0;">
         <h1 style="font-size: 3.5rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">LadenPass</h1>
@@ -256,12 +270,34 @@ elif "Check" in menu:
 
 
 elif "Fleet" in menu:
-    st.title("Fleet Assets")
-    st.markdown("""<style>[data-testid="stDataFrame"] { background-color: white; padding: 10px; border-radius: 10px; }</style>""", unsafe_allow_html=True)
-    data = {
-        "ID": ["PM-104", "PM-105", "TR-882"],
-        "Type": ["Prime Mover", "Prime Mover", "Low Loader"],
-        "GVM": ["26.5t", "32.0t", "45.0t"],
-        "Status": ["Active", "Maintenance", "Active"]
-    }
-    st.dataframe(pd.DataFrame(data), use_container_width=True)
+    st.title("Fleet Assets Manager")
+    st.markdown("Double-click any cell to edit. Use the toolbar to add or delete rows.")
+    
+    # --- EDITABLE DATAFRAME ---
+    # We use st.data_editor to allow CRUD operations directly in the UI
+    edited_df = st.data_editor(
+        st.session_state.fleet_df,
+        use_container_width=True,
+        num_rows="dynamic", # This enables the "Add" and "Delete" buttons
+        hide_index=True,
+        column_config={
+            "Status": st.column_config.SelectboxColumn(
+                "Status",
+                help="Current operational status",
+                width="medium",
+                options=["Active", "Maintenance", "Decommissioned", "Sold"],
+                required=True,
+            ),
+            "GVM Rating": st.column_config.TextColumn("GVM Rating"),
+            "Rego Expiry": st.column_config.DateColumn("Rego Expiry")
+        }
+    )
+    
+    # Save changes back to session state so they persist if we switch tabs
+    st.session_state.fleet_df = edited_df
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Example "Save to Cloud" button (simulation)
+    if st.button("💾 SAVE CHANGES TO CLOUD"):
+        st.success("✅ Database updated successfully.")
