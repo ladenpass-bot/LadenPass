@@ -1,6 +1,5 @@
 import streamlit as st
 import datetime
-import pandas as pd
 
 # --- 1. PAGE CONFIGURATION ---
 st.set_page_config(
@@ -11,13 +10,14 @@ st.set_page_config(
 )
 
 # --- 2. PROFESSIONAL STYLING (CSS) ---
+# This section handles the Background Image, Fonts, and Colors
 st.markdown("""
     <style>
     /* --- MAIN BACKGROUND --- */
-    /* We use a permanent Unsplash URL for the Australian Outback look */
+    /* We add a dark overlay (0.7 opacity) so the white text pops against the photo */
     .stApp {
-        background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
-        url("https://images.unsplash.com/photo-1546556536-3d710f970d4d?q=80&w=2574&auto=format&fit=crop");
+        background-image: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), 
+        url("http://googleusercontent.com/image_collection/image_retrieval/14116698006579212757_0");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
