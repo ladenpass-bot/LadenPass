@@ -18,7 +18,6 @@ def get_base64_image(image_path):
     except FileNotFoundError:
         return None
 
-# Convert local logo to embeddable string
 logo_b64 = get_base64_image("logo.jpg")
 
 # --- 3. PROFESSIONAL STYLING (CSS) ---
@@ -44,21 +43,57 @@ st.markdown("""
         border-right: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* --- LOGO BADGE (FIXED) --- */
+    /* --- LOGO CONTAINER --- */
     .logo-container {
         background-color: white;
         padding: 20px;
         border-radius: 12px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        margin-bottom: 20px;
         text-align: center;
         display: flex;
         justify-content: center;
         align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     .logo-container img {
         max-width: 100%;
         height: auto;
+    }
+
+    /* --- NAVIGATION TRANSFORMATION (The "Big Button" Fix) --- */
+    /* This targets the radio button container */
+    [data-testid="stRadio"] > div {
+        gap: 15px; /* Adds space between buttons */
+    }
+
+    /* This targets the individual radio options to look like Cards */
+    [data-testid="stRadio"] label {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        padding: 15px 20px !important; /* Make them fat and clickable */
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s ease !important;
+        margin-bottom: 5px !important;
+        cursor: pointer !important;
+    }
+    
+    /* Hover Effect */
+    [data-testid="stRadio"] label:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        border-color: #4ade80 !important; /* Green border on hover */
+        transform: translateX(5px); /* Slight nudge to the right */
+    }
+
+    /* Active/Selected State (Make the text bold/green) */
+    [data-testid="stRadio"] label[data-checked="true"] {
+        background-color: rgba(34, 197, 94, 0.2) !important; /* Green tint */
+        border-color: #22c55e !important;
+        font-weight: bold !important;
+    }
+    /* Increase font size of the options */
+    [data-testid="stRadio"] p {
+        font-size: 1.1rem !important;
+        font-weight: 500 !important;
     }
 
     /* --- GLASS CARDS --- */
@@ -92,6 +127,8 @@ st.markdown("""
         border: none;
         font-weight: 600;
         width: 100%;
+        padding: 0.8rem;
+        font-size: 1.1rem;
     }
     .stButton > button:hover { background-color: #16a34a !important; }
     
@@ -101,33 +138,38 @@ st.markdown("""
 
 # --- 4. SIDEBAR CONTENT ---
 with st.sidebar:
-    # --- FIXED LOGO RENDERING ---
-    # This HTML block renders ONE clean white box with the image inside.
+    # 1. LOGO
     if logo_b64:
-        st.markdown(f"""
-            <div class="logo-container">
-                <img src="data:image/jpeg;base64,{logo_b64}" alt="LadenPass Logo">
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}"></div>""", unsafe_allow_html=True)
     else:
-        # Fallback if image is missing
-        st.markdown("""
-            <div class="logo-container">
-                <h2 style="color:#064e3b !important; margin:0;">LadenPass</h2>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown("""<div class="logo-container"><h2 style="color:#064e3b !important; margin:0;">LadenPass</h2></div>""", unsafe_allow_html=True)
     
-    st.markdown("### Platform Navigation")
-    menu = st.radio("", ["Dashboard", "Compliance Check", "Fleet Management"], label_visibility="collapsed")
+    # 2. GUIDING HEADER
+    st.markdown("### Select Action")
+    st.markdown("Please choose a module below to begin.")
+    
+    # 3. BIG NAVIGATION BUTTONS
+    # We use emojis and longer text to make them feel like "options"
+    menu = st.radio(
+        "", 
+        [
+            "📊 Operations Dashboard", 
+            "✅ Start Compliance Check", 
+            "🚛 Manage Fleet Assets"
+        ], 
+        label_visibility="collapsed"
+    )
     
     st.markdown("---")
-    st.success("🟢 System Operational")
-    st.markdown("<div style='text-align: center; font-size: 0.8rem; opacity: 0.7;'>© 2026 LadenPass Enterprise</div>", unsafe_allow_html=True)
+    st.success("🟢 System Online")
+    st.markdown("<div style='font-size: 0.8rem; opacity: 0.7;'>© 2026 LadenPass Enterprise</div>", unsafe_allow_html=True)
 
 
 # --- 5. MAIN CONTENT ---
 
-if menu == "Dashboard":
+# MAPPING SELECTION TO CONTENT
+# Because we changed the names in the menu, we map them back to logic
+if "Dashboard" in menu:
     # HERO
     st.markdown("""
     <div style="text-align: center; padding: 50px 20px 30px 20px;">
@@ -184,7 +226,7 @@ if menu == "Dashboard":
         """, unsafe_allow_html=True)
 
 
-elif menu == "Compliance Check":
+elif "Compliance" in menu:
     st.title("New Movement Assessment")
     
     with st.container():
@@ -242,7 +284,7 @@ elif menu == "Compliance Check":
             """, unsafe_allow_html=True)
 
 
-elif menu == "Fleet Management":
+elif "Fleet" in menu:
     st.title("Fleet Assets")
     
     st.markdown("""
