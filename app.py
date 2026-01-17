@@ -194,12 +194,10 @@ if not st.session_state.logged_in:
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='text-align: center; margin-bottom: 10px;'>Don't have an account?</div>", unsafe_allow_html=True)
         
-        # --- NEW CENTERED BUTTON ---
-        # We replace st.link_button with a custom HTML structure to guarantee centering and style.
-        # Replace '#' with your actual Stripe Link.
+        # --- PASTE YOUR STRIPE LINK BELOW ---
         st.markdown("""
             <div class="subscribe-btn-container">
-                <a href="#" class="subscribe-btn" target="_blank">
+                <a href="YOUR_STRIPE_LINK_HERE" class="subscribe-btn" target="_blank">
                     💳 SUBSCRIBE NOW ($99/mo)
                 </a>
             </div>
