@@ -134,15 +134,19 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 4. SESSION STATE (DATABASE) ---
-# This simulates a database so edits persist while clicking around
 if "fleet_df" not in st.session_state:
-    st.session_state.fleet_df = pd.DataFrame({
+    # 1. Create the Data
+    df = pd.DataFrame({
         "Asset ID": ["PM-104", "PM-105", "TR-882"],
         "Type": ["Prime Mover", "Prime Mover", "Low Loader"],
         "GVM Rating": ["26.5t", "32.0t", "45.0t"],
         "Status": ["Active", "Maintenance", "Active"],
         "Rego Expiry": ["2026-10-12", "2026-08-01", "2026-12-15"]
     })
+    # 2. FIX: Convert the date column to actual datetime objects immediately
+    df["Rego Expiry"] = pd.to_datetime(df["Rego Expiry"])
+    
+    st.session_state.fleet_df = df
 
 # --- 5. SIDEBAR CONTENT ---
 with st.sidebar:
@@ -274,11 +278,10 @@ elif "Fleet" in menu:
     st.markdown("Double-click any cell to edit. Use the toolbar to add or delete rows.")
     
     # --- EDITABLE DATAFRAME ---
-    # We use st.data_editor to allow CRUD operations directly in the UI
     edited_df = st.data_editor(
         st.session_state.fleet_df,
         use_container_width=True,
-        num_rows="dynamic", # This enables the "Add" and "Delete" buttons
+        num_rows="dynamic",
         hide_index=True,
         column_config={
             "Status": st.column_config.SelectboxColumn(
@@ -289,15 +292,16 @@ elif "Fleet" in menu:
                 required=True,
             ),
             "GVM Rating": st.column_config.TextColumn("GVM Rating"),
-            "Rego Expiry": st.column_config.DateColumn("Rego Expiry")
+            "Rego Expiry": st.column_config.DateColumn(
+                "Rego Expiry",
+                format="DD/MM/YYYY" # Force Australian Date Format
+            )
         }
     )
     
-    # Save changes back to session state so they persist if we switch tabs
     st.session_state.fleet_df = edited_df
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Example "Save to Cloud" button (simulation)
     if st.button("💾 SAVE CHANGES TO CLOUD"):
         st.success("✅ Database updated successfully.")
