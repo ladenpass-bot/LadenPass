@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import datetime
+import base64
 
 # --- 1. ENTERPRISE PAGE CONFIG ---
 st.set_page_config(
@@ -10,14 +10,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. PROFESSIONAL STYLING SYSTEM (CSS) ---
+# --- 2. HELPER: LOAD IMAGE CORRECTLY ---
+def get_base64_image(image_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except FileNotFoundError:
+        return None
+
+# Convert local logo to embeddable string
+logo_b64 = get_base64_image("logo.jpg")
+
+# --- 3. PROFESSIONAL STYLING (CSS) ---
 st.markdown("""
     <style>
-    /* --- GLOBAL THEME & BACKGROUND --- */
+    /* --- GLOBAL THEME --- */
     .stApp {
         background-color: #0f172a; 
-        /* Heavy Hauler Background Image */
-        background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.9)), 
+        background-image: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), 
         url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
         background-size: cover;
         background-position: center;
@@ -25,49 +35,48 @@ st.markdown("""
     }
 
     /* --- TYPOGRAPHY --- */
-    h1, h2, h3, h4, h5, h6 {
-        color: #ffffff !important;
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        font-weight: 600;
-    }
-    p, li, label, span, div {
-        color: #e2e8f0 !important;
-    }
+    h1, h2, h3, h4, h5, h6 { color: #ffffff !important; }
+    p, li, label, span, div { color: #e2e8f0 !important; }
     
-    /* --- SIDEBAR BRANDING --- */
+    /* --- SIDEBAR --- */
     [data-testid="stSidebar"] {
-        background-color: #064e3b !important; /* Deep Enterprise Green */
+        background-color: #064e3b !important;
         border-right: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* --- BIG LOGO BADGE (SIDEBAR) --- */
-    .logo-box {
+    /* --- LOGO BADGE (FIXED) --- */
+    .logo-container {
         background-color: white;
-        padding: 20px; /* Increased padding */
+        padding: 20px;
         border-radius: 12px;
         margin-bottom: 30px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .logo-container img {
+        max-width: 100%;
+        height: auto;
     }
 
-    /* --- GLASSMORPHISM CARDS --- */
+    /* --- GLASS CARDS --- */
     .glass-card {
         background-color: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 25px;
         border-radius: 12px;
         margin-bottom: 20px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s;
     }
     .glass-card:hover {
         transform: translateY(-2px);
         background-color: rgba(255, 255, 255, 0.12);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
-    /* --- INPUT FIELDS --- */
+    /* --- INPUTS & BUTTONS --- */
     .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
         background-color: #ffffff !important;
         color: #0f172a !important;
@@ -76,50 +85,50 @@ st.markdown("""
     }
     div[role="listbox"] ul { background-color: white !important; }
     div[role="option"] { color: black !important; }
-
-    /* --- BUTTONS --- */
+    
     .stButton > button {
         background-color: #22c55e !important;
         color: white !important;
         border: none;
-        border-radius: 6px;
-        padding: 0.6rem 1.2rem;
         font-weight: 600;
         width: 100%;
     }
     .stButton > button:hover { background-color: #16a34a !important; }
     
-    /* HIDE DEFAULT ELEMENTS */
     #MainMenu, footer, header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SIDEBAR NAVIGATION ---
+# --- 4. SIDEBAR CONTENT ---
 with st.sidebar:
-    # --- LOGO SECTION ---
-    # This is the primary brand anchor in the sidebar
-    st.markdown('<div class="logo-box">', unsafe_allow_html=True)
-    try:
-        st.image("logo.jpg", use_container_width=True)
-    except:
-        # Fallback if image breaks
-        st.markdown("<h1 style='color:#064e3b !important; margin:0; font-size:2rem;'>LadenPass</h1>", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    # --- FIXED LOGO RENDERING ---
+    # This HTML block renders ONE clean white box with the image inside.
+    if logo_b64:
+        st.markdown(f"""
+            <div class="logo-container">
+                <img src="data:image/jpeg;base64,{logo_b64}" alt="LadenPass Logo">
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        # Fallback if image is missing
+        st.markdown("""
+            <div class="logo-container">
+                <h2 style="color:#064e3b !important; margin:0;">LadenPass</h2>
+            </div>
+            """, unsafe_allow_html=True)
     
-    # NAV
     st.markdown("### Platform Navigation")
     menu = st.radio("", ["Dashboard", "Compliance Check", "Fleet Management"], label_visibility="collapsed")
     
     st.markdown("---")
-    st.info("🟢 System Operational")
+    st.success("🟢 System Operational")
     st.markdown("<div style='text-align: center; font-size: 0.8rem; opacity: 0.7;'>© 2026 LadenPass Enterprise</div>", unsafe_allow_html=True)
 
 
-# --- 4. MAIN CONTENT ---
+# --- 5. MAIN CONTENT ---
 
 if menu == "Dashboard":
-    # --- BRANDED HERO SECTION ---
-    # This is the critical change: "LadenPass" is now the massive Hero Title
+    # HERO
     st.markdown("""
     <div style="text-align: center; padding: 50px 20px 30px 20px;">
         <h1 style="font-size: 4.5rem; margin-bottom: 0; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">
