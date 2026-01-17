@@ -33,7 +33,7 @@ st.markdown("""
     /* GLOBAL THEME */
     .stApp {
         background-color: #0f172a; 
-        background-image: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), 
+        background-image: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.94)), 
         url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
         background-size: cover;
         background-position: center;
@@ -42,7 +42,7 @@ st.markdown("""
 
     /* TYPOGRAPHY */
     h1, h2, h3, h4, h5, h6 { color: #ffffff !important; margin-bottom: 5px !important; }
-    p, li, label, span, div { color: #e2e8f0 !important; }
+    p, li, label, span, div { color: #cbd5e1 !important; }
     
     /* SIDEBAR */
     [data-testid="stSidebar"] {
@@ -90,17 +90,18 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 20px;
+        padding: 25px;
         border-radius: 10px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         transition: transform 0.2s;
+        height: 100%;
     }
     .glass-card:hover {
         transform: translateY(-2px);
         background-color: rgba(255, 255, 255, 0.12);
     }
-    .glass-card h3 { font-size: 1.5rem !important; margin: 0 !important; }
-    .glass-card p { font-size: 0.9rem !important; margin: 0 !important; opacity: 0.8; }
+    .glass-card h3 { font-size: 1.4rem !important; margin-bottom: 10px !important; }
+    .glass-card p { font-size: 0.95rem !important; line-height: 1.5 !important; opacity: 0.9; }
 
     /* INPUTS & BUTTONS */
     .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
@@ -121,34 +122,12 @@ st.markdown("""
         padding: 0.6rem;
     }
     .stButton > button:hover { background-color: #16a34a !important; }
-
-    /* DATA EDITOR (The Spreadsheet Look) */
-    [data-testid="stDataEditor"] {
-        background-color: white;
-        border-radius: 10px;
-        padding: 10px;
-    }
     
     #MainMenu, footer, header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. SESSION STATE (DATABASE) ---
-if "fleet_df" not in st.session_state:
-    # 1. Create the Data
-    df = pd.DataFrame({
-        "Asset ID": ["PM-104", "PM-105", "TR-882"],
-        "Type": ["Prime Mover", "Prime Mover", "Low Loader"],
-        "GVM Rating": ["26.5t", "32.0t", "45.0t"],
-        "Status": ["Active", "Maintenance", "Active"],
-        "Rego Expiry": ["2026-10-12", "2026-08-01", "2026-12-15"]
-    })
-    # 2. FIX: Convert the date column to actual datetime objects immediately
-    df["Rego Expiry"] = pd.to_datetime(df["Rego Expiry"])
-    
-    st.session_state.fleet_df = df
-
-# --- 5. SIDEBAR CONTENT ---
+# --- 4. SIDEBAR CONTENT ---
 with st.sidebar:
     if logo_b64:
         st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}"></div>""", unsafe_allow_html=True)
@@ -156,9 +135,10 @@ with st.sidebar:
         st.markdown("""<div class="logo-container"><h2 style="color:#064e3b !important; margin:0;">LadenPass</h2></div>""", unsafe_allow_html=True)
     
     st.markdown("### Action Menu")
+    
     menu = st.radio(
         "", 
-        ["📊 Dashboard", "✅ New Check", "🚛 Fleet"], 
+        ["📊 Dashboard", "✅ New Check"], 
         label_visibility="collapsed"
     )
     
@@ -174,49 +154,71 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 
-# --- 6. MAIN CONTENT ---
+# --- 5. MAIN CONTENT ---
 
 if "Dashboard" in menu:
-    # HERO
+    # HERO SECTION
     st.markdown("""
-    <div style="text-align: center; padding: 10px 0 20px 0;">
-        <h1 style="font-size: 3.5rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">LadenPass</h1>
-        <p style="font-size: 1.1rem; opacity: 0.9; margin-top: -5px;">
-            Enterprise Automated Network Access
+    <div style="text-align: center; padding: 20px 0 30px 0;">
+        <h1 style="font-size: 4rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">LadenPass</h1>
+        <h3 style="color: #4ade80 !important; font-weight: 400; font-size: 1.6rem; margin-top: 10px;">
+            Intelligent Heavy Vehicle Compliance
+        </h3>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # STRATEGIC OVERVIEW (The new "Purpose" section)
+    st.markdown("""
+    <div style="background-color: rgba(15, 23, 42, 0.6); border-left: 4px solid #4ade80; padding: 20px; border-radius: 0 8px 8px 0; margin-bottom: 40px; max-width: 900px; margin-left: auto; margin-right: auto;">
+        <p style="font-size: 1.1rem; line-height: 1.6;">
+            <b>LadenPass digitizes the Class 1 Heavy Vehicle permit process.</b><br>
+            Traditionally, moving oversize and overmass loads requires a manual 28-day approval cycle involving bridge engineers and local councils. 
+            LadenPass automates this by cross-referencing vehicle engineering data against the <b>National Heavy Vehicle Regulator (NHVR)</b> 
+            structural database in real-time.
+        </p>
+        <p style="font-size: 1.1rem; line-height: 1.6; margin-top: 10px;">
+            Our platform provides logistics operators with <b>instant feasibility assessments</b>, automatically flagging bridge restrictions, 
+            electrical clearance hazards, and route constraints before an application is even lodged.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-    # METRICS
+    # METRICS ROW
     c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown('<div class="glass-card"><h3>98%</h3><p>Auto-Approval</p></div>', unsafe_allow_html=True)
-    with c2: st.markdown('<div class="glass-card"><h3>< 2s</h3><p>Speed</p></div>', unsafe_allow_html=True)
-    with c3: st.markdown('<div class="glass-card"><h3>100%</h3><p>Compliant</p></div>', unsafe_allow_html=True)
-    with c4: st.markdown('<div class="glass-card"><h3>24/7</h3><p>Uptime</p></div>', unsafe_allow_html=True)
+    with c1: st.markdown('<div class="glass-card" style="text-align:center;"><h3>98%</h3><p>Pre-Approval Accuracy</p></div>', unsafe_allow_html=True)
+    with c2: st.markdown('<div class="glass-card" style="text-align:center;"><h3>< 2s</h3><p>Structural Calculation</p></div>', unsafe_allow_html=True)
+    with c3: st.markdown('<div class="glass-card" style="text-align:center;"><h3>100%</h3><p>Gazette Compliance</p></div>', unsafe_allow_html=True)
+    with c4: st.markdown('<div class="glass-card" style="text-align:center;"><h3>24/7</h3><p>Network Availability</p></div>', unsafe_allow_html=True)
 
-    # CAPABILITIES
-    st.markdown("### Capabilities")
+    # CORE CAPABILITIES (Expanded Detail)
+    st.markdown("<br>### Core Capabilities", unsafe_allow_html=True)
     fc1, fc2, fc3 = st.columns(3)
     
     with fc1:
         st.markdown("""
         <div class="glass-card">
-            <h3 style="color:#4ade80 !important; font-size: 1.2rem !important;">⚡ Instant Feasibility</h3>
-            <p>Real-time structural assessment of bridges.</p>
+            <h3 style="color:#4ade80 !important;">⚡ Automated Feasibility</h3>
+            <p>
+                Eliminates manual bridge assessments. The engine calculates "Bridge Formula" Tier 1 compliance instantly, identifying structures incapable of supporting your specific GCM and axle spacing.
+            </p>
         </div>
         """, unsafe_allow_html=True)
     with fc2:
         st.markdown("""
         <div class="glass-card">
-            <h3 style="color:#60a5fa !important; font-size: 1.2rem !important;">🗺️ Dynamic Routing</h3>
-            <p>Avoids height-restricted infrastructure.</p>
+            <h3 style="color:#60a5fa !important;">🗺️ Dynamic Asset Routing</h3>
+            <p>
+                Routes are validated against 4.6m clearway height restrictions and load-limited assets. The system automatically suggests compliant alternatives to avoid "Referral Required" zones.
+            </p>
         </div>
         """, unsafe_allow_html=True)
     with fc3:
         st.markdown("""
         <div class="glass-card">
-            <h3 style="color:#f472b6 !important; font-size: 1.2rem !important;">📄 Permit Automation</h3>
-            <p>Pre-filled NHVR permit applications.</p>
+            <h3 style="color:#f472b6 !important;">📄 Regulatory Alignment</h3>
+            <p>
+                Full integration with the current NHVR Class 1 Notice. The platform generates pre-filled permit applications that meet all federal and state jurisdiction requirements.
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -271,37 +273,3 @@ elif "Check" in menu:
                 </ul>
             </div>
             """, unsafe_allow_html=True)
-
-
-elif "Fleet" in menu:
-    st.title("Fleet Assets Manager")
-    st.markdown("Double-click any cell to edit. Use the toolbar to add or delete rows.")
-    
-    # --- EDITABLE DATAFRAME ---
-    edited_df = st.data_editor(
-        st.session_state.fleet_df,
-        use_container_width=True,
-        num_rows="dynamic",
-        hide_index=True,
-        column_config={
-            "Status": st.column_config.SelectboxColumn(
-                "Status",
-                help="Current operational status",
-                width="medium",
-                options=["Active", "Maintenance", "Decommissioned", "Sold"],
-                required=True,
-            ),
-            "GVM Rating": st.column_config.TextColumn("GVM Rating"),
-            "Rego Expiry": st.column_config.DateColumn(
-                "Rego Expiry",
-                format="DD/MM/YYYY" # Force Australian Date Format
-            )
-        }
-    )
-    
-    st.session_state.fleet_df = edited_df
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    if st.button("💾 SAVE CHANGES TO CLOUD"):
-        st.success("✅ Database updated successfully.")
