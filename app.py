@@ -61,18 +61,6 @@ st.markdown("""
     }
     .logo-container img { max-width: 100%; height: auto; }
 
-    /* LOGIN BOX */
-    .login-box {
-        background-color: rgba(255, 255, 255, 0.05);
-        padding: 40px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        max-width: 500px;
-        margin: 50px auto;
-        text-align: center;
-        backdrop-filter: blur(10px);
-    }
-
     /* GLASS CARDS */
     .glass-card {
         background-color: rgba(255, 255, 255, 0.08);
@@ -102,6 +90,15 @@ st.markdown("""
         padding: 0.6rem;
     }
     .stButton > button:hover { background-color: #16a34a !important; }
+
+    /* FORM STYLING */
+    [data-testid="stForm"] {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
     
     #MainMenu, footer, header {visibility: hidden;}
     </style>
@@ -142,7 +139,7 @@ with st.sidebar:
 
 # --- 6. MAIN CONTENT ---
 
-# --- SCENARIO A: USER IS NOT LOGGED IN (THE SALES PAGE) ---
+# --- SCENARIO A: LOGIN SCREEN (THE FIX) ---
 if not st.session_state.logged_in:
     st.markdown("""
     <div style="text-align: center; padding: 40px 0;">
@@ -153,30 +150,32 @@ if not st.session_state.logged_in:
     </div>
     """, unsafe_allow_html=True)
     
-    # LOGIN FORM
+    # CENTRAL COLUMN FOR LOGIN
     c1, c2, c3 = st.columns([1, 1, 1])
     with c2:
-        st.markdown('<div class="login-box">', unsafe_allow_html=True)
-        st.subheader("Client Login")
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
+        # WE USE ST.FORM INSTEAD OF HTML DIVS
+        with st.form("login_form"):
+            st.subheader("Client Login")
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            
+            # Form submit button allows "Enter" key to work
+            submitted = st.form_submit_button("Login")
+            
+            if submitted:
+                if username == "admin" and password == "trucks":
+                    st.session_state.logged_in = True
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials.")
         
-        if st.button("Login"):
-            # SIMPLE AUTH LOGIC (Replace with real DB later)
-            if username == "admin" and password == "trucks":
-                st.session_state.logged_in = True
-                st.rerun()
-            else:
-                st.error("Invalid credentials.")
-        
-        st.markdown("---")
-        st.markdown("Don't have an account?")
-        # STRIPE LINK (Replace with your actual Stripe Payment Link)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'>Don't have an account?</div>", unsafe_allow_html=True)
+        # STRIPE SUBSCRIPTION BUTTON
         st.link_button("💳 SUBSCRIBE NOW ($99/mo)", "https://stripe.com")
-        st.markdown('</div>', unsafe_allow_html=True)
 
 
-# --- SCENARIO B: USER IS LOGGED IN (THE REAL APP) ---
+# --- SCENARIO B: DASHBOARD (LOGGED IN) ---
 else:
     if "Dashboard" in menu:
         # HERO
