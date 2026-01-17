@@ -2,303 +2,171 @@ import streamlit as st
 import pandas as pd
 import base64
 import datetime
-import time
 
-# --- 1. ENTERPRISE PAGE CONFIG ---
+# --- 1. CONFIGURATION ---
 st.set_page_config(
-    page_title="LadenPass | Enterprise Platform",
+    page_title="LadenPass | Automated Compliance",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- 2. HELPER: LOAD IMAGE CORRECTLY ---
-def get_base64_image(image_path):
-    try:
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    except FileNotFoundError:
-        return None
+# --- 2. AUTOMATED ENGINEERING ENGINE (THE "PRODUCT") ---
+def check_compliance(gcm, axles, width, height):
+    """
+    Real logic based on NHVR General Mass Limits (GML) 
+    and Dimension requirements.
+    """
+    report = {
+        "status": "COMPLIANT",
+        "color": "#22c55e", # Green
+        "issues": [],
+        "permit_type": "General Access (No Permit Required)"
+    }
 
-logo_b64 = get_base64_image("logo.jpg")
+    # --- A. DIMENSION CHECKS ---
+    if width > 2.5:
+        report["issues"].append(f"⚠️ **Width ({width}m):** Exceeds 2.5m General Access limit.")
+        report["permit_type"] = "Class 1 Oversize Permit Required"
+        report["status"] = "CONDITIONAL"
+        report["color"] = "#f59e0b" # Orange
 
-# --- 3. PROFESSIONAL STYLING (CSS) ---
+    if height > 4.3:
+        report["issues"].append(f"⛔ **Height ({height}m):** Exceeds 4.3m standard clearance.")
+        report["permit_type"] = "High Productivity / Oversize Permit"
+        report["status"] = "NON-COMPLIANT"
+        report["color"] = "#ef4444" # Red
+
+    # --- B. MASS CHECKS (General Mass Limits) ---
+    # Standard GML Cap is roughly 42.5t for 6 axles (semi) or higher for B-Doubles
+    # This is a simplified logic for the MVP
+    gml_limit = 42.5
+    if axles >= 7: gml_limit = 50.0 # B-Double allowance
+    if axles >= 9: gml_limit = 62.5 # B-Triple allowance
+
+    if gcm > gml_limit:
+        report["issues"].append(f"⚠️ **Mass ({gcm}t):** Exceeds {gml_limit}t General Access limit.")
+        if report["status"] != "NON-COMPLIANT":
+            report["status"] = "CONDITIONAL"
+            report["permit_type"] = "Class 1 Overmass Permit Required"
+            report["color"] = "#f59e0b"
+
+    # --- C. TIER 1 BRIDGE FORMULA (Simplified) ---
+    # Formula approximation: Mass must be distributed. 
+    # If Mass / Axles > 6.5t per axle, it's likely damaging bridges.
+    avg_axle_load = gcm / axles
+    if avg_axle_load > 7.0:
+        report["issues"].append(f"⛔ **Axle Load ({avg_axle_load:.1f}t):** Exceeds Tier 1 Bridge Safety limits (>7t/axle).")
+        report["status"] = "CRITICAL FAIL"
+        report["color"] = "#ef4444"
+        report["permit_type"] = "Structural Assessment Required"
+
+    return report
+
+# --- 3. UI SETUP ---
+logo_b64 = None 
+try:
+    with open("logo.jpg", "rb") as img_file:
+        logo_b64 = base64.b64encode(img_file.read()).decode()
+except FileNotFoundError:
+    pass
+
 st.markdown("""
     <style>
-    /* REMOVE TOP WHITESPACE */
-    .block-container { padding-top: 1rem !important; padding-bottom: 1rem !important; }
-
-    /* GLOBAL THEME */
-    .stApp {
-        background-color: #0f172a; 
-        background-image: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.94)), 
-        url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
+    .stApp { background-color: #0f172a; color: white; }
+    [data-testid="stSidebar"] { background-color: #064e3b; }
+    .glass-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+    .stButton>button { background-color: #22c55e; color: white; border: none; width: 100%; padding: 10px; font-weight: bold; }
+    h1, h2, h3 { color: white !important; }
+    p, label { color: #cbd5e1 !important; }
+    /* STRIPE BUTTON STYLE */
+    .stripe-btn { 
+        background: #635bff; color: white; padding: 10px 20px; 
+        border-radius: 5px; text-decoration: none; display: block; text-align: center; margin-top: 10px;
     }
-
-    /* TYPOGRAPHY */
-    h1, h2, h3, h4, h5, h6 { color: #ffffff !important; }
-    p, li, label, span, div { color: #cbd5e1 !important; }
-    
-    /* SIDEBAR */
-    [data-testid="stSidebar"] {
-        background-color: #064e3b !important;
-        border-right: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    /* LOGO CONTAINER */
-    .logo-container {
-        background-color: white;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 15px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    .logo-container img { max-width: 100%; height: auto; }
-
-    /* GLASS CARDS */
-    .glass-card {
-        background-color: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 25px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        height: 100%;
-    }
-    
-    /* INPUTS & BUTTONS */
-    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-        border-radius: 6px;
-    }
-    div[role="listbox"] ul { background-color: white !important; }
-    div[role="option"] { color: black !important; }
-    
-    .stButton > button {
-        background-color: #22c55e !important;
-        color: white !important;
-        border: none;
-        font-weight: 600;
-        width: 100%;
-        padding: 0.6rem;
-    }
-    .stButton > button:hover { background-color: #16a34a !important; }
-
-    /* FORM STYLING */
-    [data-testid="stForm"] {
-        background-color: rgba(255, 255, 255, 0.05);
-        padding: 30px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-    }
-
-    /* CUSTOM SUBSCRIBE BUTTON */
-    .subscribe-btn-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
-    }
-    .subscribe-btn {
-        display: inline-block;
-        background: linear-gradient(45deg, #f59e0b, #d97706);
-        color: white !important;
-        padding: 12px 30px;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 1.1rem;
-        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-    .subscribe-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
-        color: white !important;
-        text-decoration: none;
-    }
-    
-    /* DISCLAIMER FOOTER */
-    .disclaimer {
-        font-size: 0.75rem;
-        color: #64748b !important;
-        text-align: center;
-        margin-top: 50px;
-        padding-top: 20px;
-        border-top: 1px solid #334155;
-    }
-
-    #MainMenu, footer, header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. SESSION STATE (USER LOGIN & DATABASE) ---
+# --- 4. SESSION STATE ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-if "job_db" not in st.session_state:
-    # Simulating a database of recent jobs
-    st.session_state.job_db = pd.DataFrame([
-        {"Ref": "JOB-1001", "Status": "Complete", "Date": "2023-10-24", "Outcome": "Permit Issued"},
-        {"Ref": "JOB-1002", "Status": "Complete", "Date": "2023-10-25", "Outcome": "Route Adjustment"}
-    ])
-
-# --- 5. SIDEBAR CONTENT ---
+# --- 5. SIDEBAR ---
 with st.sidebar:
-    if logo_b64:
-        st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}"></div>""", unsafe_allow_html=True)
-    else:
-        st.markdown("""<div class="logo-container"><h2 style="color:#064e3b !important; margin:0;">LadenPass</h2></div>""", unsafe_allow_html=True)
-    
+    st.markdown("## LadenPass")
     if st.session_state.logged_in:
-        st.markdown("### Action Menu")
-        menu = st.radio("", ["📊 Dashboard", "✅ New Assessment"], label_visibility="collapsed")
-        
-        st.markdown("---")
-        if st.button("Log Out"):
+        menu = st.radio("Menu", ["Dashboard", "Run Check"], label_visibility="collapsed")
+        if st.button("Logout"):
             st.session_state.logged_in = False
             st.rerun()
-            
-        st.success("🟢 Online")
     else:
-        st.info("🔒 Secure Access")
-        st.caption("Please log in to access the Enterprise Platform.")
+        st.info("🔒 System Locked")
 
-    current_year = datetime.datetime.now().year
-    st.markdown(f"""
-        <div style='text-align: center; font-size: 0.8rem; color: #cbd5e1; margin-top: 15px; opacity: 0.8;'>
-            © {current_year} LadenPass Enterprise
-        </div>
-    """, unsafe_allow_html=True)
+# --- 6. MAIN APP LOGIC ---
 
-
-# --- 6. MAIN CONTENT ---
-
-# --- SCENARIO A: LOGIN SCREEN ---
+# >>> VIEW 1: SALES / LOGIN PAGE <<<
 if not st.session_state.logged_in:
-    st.markdown("""
-    <div style="text-align: center; padding: 40px 0;">
-        <h1 style="font-size: 3.5rem;">LadenPass Enterprise</h1>
-        <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto; opacity: 0.9;">
-            The automated network access platform for Class 1 Heavy Vehicles.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    c1, c2, c3 = st.columns([1, 1, 1])
-    with c2:
-        with st.form("login_form"):
-            st.subheader("Client Login")
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            submitted = st.form_submit_button("Login")
-            
-            if submitted:
-                if username == "admin" and password == "trucks":
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.title("LadenPass Automator")
+        st.markdown("### Instant Heavy Vehicle Compliance Checks")
+        st.markdown("Stop guessing. Know if your load is legal in 2 seconds.")
+        
+        with st.form("login"):
+            st.subheader("Subscriber Login")
+            user = st.text_input("Username")
+            pw = st.text_input("Password", type="password")
+            if st.form_submit_button("Login"):
+                if user == "admin" and pw == "trucks":
                     st.session_state.logged_in = True
                     st.rerun()
                 else:
-                    st.error("Invalid credentials.")
+                    st.error("Access Denied")
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center; margin-bottom: 10px;'>Don't have an account?</div>", unsafe_allow_html=True)
-        
-        # --- LIVE STRIPE LINK ---
-        st.markdown("""
-            <div class="subscribe-btn-container">
-                <a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="subscribe-btn" target="_blank">
-                    💳 SUBSCRIBE NOW ($99/mo)
-                </a>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("---")
+        # INSERT YOUR STRIPE LINK HERE
+        st.markdown('<a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="stripe-btn" target="_blank">💳 SUBSCRIBE ($99/mo)</a>', unsafe_allow_html=True)
 
-
-# --- SCENARIO B: LOGGED IN AREA ---
+# >>> VIEW 2: THE AUTOMATED TOOL <<<
 else:
-    if "Dashboard" in menu:
-        st.markdown("""
-        <div style="text-align: center; padding: 20px 0 30px 0;">
-            <h1 style="font-size: 3rem;">Operations Dashboard</h1>
-            <p style="font-size: 1.1rem; opacity: 0.9;">Welcome back, Admin User.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    if menu == "Dashboard":
+        st.title("Operations Dashboard")
+        c1, c2, c3 = st.columns(3)
+        with c1: st.markdown('<div class="glass-card"><h3>🟢 Online</h3><p>Engine Ready</p></div>', unsafe_allow_html=True)
+        with c2: st.markdown('<div class="glass-card"><h3>⚡ Instant</h3><p>Calculation Mode</p></div>', unsafe_allow_html=True)
+        with c3: st.markdown('<div class="glass-card"><h3>🛡️ Active</h3><p>Subscription Valid</p></div>', unsafe_allow_html=True)
 
-        # Metrics (Top Row)
-        c1, c2, c3, c4 = st.columns(4)
-        with c1: st.markdown('<div class="glass-card" style="text-align:center;"><h3>Live</h3><p>Network Status</p></div>', unsafe_allow_html=True)
-        with c2: st.markdown('<div class="glass-card" style="text-align:center;"><h3>< 1hr</h3><p>Avg Turnaround</p></div>', unsafe_allow_html=True)
-        with c3: st.markdown('<div class="glass-card" style="text-align:center;"><h3>100%</h3><p>NHVR Compliant</p></div>', unsafe_allow_html=True)
-        with c4: st.markdown(f'<div class="glass-card" style="text-align:center;"><h3>{len(st.session_state.job_db)}</h3><p>Total Jobs</p></div>', unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Recent Activity Table (Updates when you submit a new job)
-        st.subheader("📋 Recent Assessment Requests")
-        st.markdown("""<style>[data-testid="stDataFrame"] { background-color: white; padding: 10px; border-radius: 10px; }</style>""", unsafe_allow_html=True)
-        st.dataframe(st.session_state.job_db, use_container_width=True, hide_index=True)
-
-    elif "Assessment" in menu:
-        st.title("New Route Assessment")
-        st.markdown("Enter vehicle parameters below. Our engineering engine will assess feasibility against NHVR structures.")
+    elif menu == "Run Check":
+        st.title("Instant Compliance Check")
+        st.markdown("Enter vehicle data to run an automated Tier 1 assessment.")
         
-        with st.form("assessment_form"):
-            st.subheader("1. Job Details")
+        with st.container():
             c1, c2 = st.columns(2)
             with c1:
-                ref = st.text_input("Job Reference (e.g., PO-998)", value="JOB-2026-X")
-                email = st.text_input("Email for Report", placeholder="admin@yourcompany.com")
+                gcm = st.number_input("Gross Combination Mass (t)", 10.0, 200.0, 42.5)
+                axles = st.number_input("Number of Axles", 3, 20, 6)
             with c2:
-                route_origin = st.text_input("Origin", placeholder="e.g. Port of Melbourne")
-                route_dest = st.text_input("Destination", placeholder="e.g. Dandenong South")
-
-            st.markdown("---")
-            st.subheader("2. Vehicle Configuration")
-            c3, c4, c5 = st.columns(3)
-            with c3:
-                gcm = st.number_input("Gross Mass (t)", 10.0, 250.0, 42.5)
-            with c4:
-                width = st.number_input("Width (m)", 2.0, 10.0, 2.5)
-            with c5:
-                height = st.number_input("Height (m)", 2.0, 8.0, 4.3)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # THE "SUBMIT" BUTTON (Replaces the instant check)
-            submitted = st.form_submit_button("🚀 SUBMIT FOR ASSESSMENT")
-            
-            if submitted:
-                if not email:
-                    st.error("⚠️ Please enter an email address for the report.")
+                width = st.number_input("Vehicle Width (m)", 2.0, 8.0, 2.5)
+                height = st.number_input("Vehicle Height (m)", 2.0, 6.0, 4.3)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("RUN AUTOMATED CHECK"):
+            with st.spinner("Calculating Physics & Regulations..."):
+                # RUN THE REAL CODE
+                result = check_compliance(gcm, axles, width, height)
+                
+                # DISPLAY RESULT
+                st.markdown(f"""
+                <div style="background: white; border-radius: 10px; padding: 20px; border-left: 10px solid {result['color']}; color: black;">
+                    <h2 style="color: black !important; margin:0;">Status: {result['status']}</h2>
+                    <p style="color: #64748b !important; font-weight: bold;">{result['permit_type']}</p>
+                    <hr>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if result['issues']:
+                    for issue in result['issues']:
+                        st.error(issue)
                 else:
-                    with st.spinner("Validating inputs and queuing for analysis..."):
-                        time.sleep(1.5) # Simulating processing time
-                        
-                        # Add to the "Fake Database" so the user sees it in the dashboard
-                        new_job = pd.DataFrame([{
-                            "Ref": ref, 
-                            "Status": "🟡 Pending Review", 
-                            "Date": datetime.date.today().strftime("%Y-%m-%d"), 
-                            "Outcome": "Processing..."
-                        }])
-                        st.session_state.job_db = pd.concat([new_job, st.session_state.job_db], ignore_index=True)
-                        
-                        st.success(f"✅ Request Received! Assessment ID: {ref}")
-                        st.info(f"Our team is processing the structural feasibility. A verified PDF report will be sent to {email} within 60 minutes.")
-
-    # --- DISCLAIMER FOOTER (CRITICAL FOR LIABILITY) ---
-    st.markdown("""
-        <div class="disclaimer">
-            <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on available NHVR data. 
-            Results are estimates only and do not constitute a legal permit. 
-            All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR) or relevant road managers.
-        </div>
-    """, unsafe_allow_html=True)
+                    st.success("✅ Configuration meets General Access Limits. No Permit Required.")
