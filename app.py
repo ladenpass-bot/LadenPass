@@ -8,74 +8,71 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. FAIL-SAFE STYLING (CSS) ---
+# --- 2. ADVANCED STYLING (Background & Glassmorphism) ---
 st.markdown("""
     <style>
-    /* 1. FORCE MAIN BACKGROUND TO WHITE */
+    /* 1. BACKGROUND IMAGE WITH DARK OVERLAY */
     .stApp {
-        background-color: #ffffff !important;
+        /* We use a linear-gradient to put a dark tint (70% opacity) over the image */
+        background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
+        url("http://googleusercontent.com/image_collection/image_retrieval/14116698006579212757_0");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
     }
 
-    /* 2. FORCE SIDEBAR BACKGROUND TO BRAND GREEN */
-    [data-testid="stSidebar"] {
-        background-color: #0e3b28 !important; /* Deep Green from Logo */
-        border-right: 1px solid #064e3b;
-    }
-
-    /* 3. FIX TEXT VISIBILITY (The Critical Fix) */
-    /* Force all main page text to be Dark Blue/Black */
+    /* 2. FORCE TEXT TO BE WHITE (For contrast against dark background) */
     .main h1, .main h2, .main h3, .main h4, .main p, .main li, .main span, .main div, .main label {
-        color: #0f172a !important;
-    }
-    
-    /* Force specific overrides for Streamlit containers that might try to be white */
-    div[data-testid="stVerticalBlock"] > div > div {
-        color: #0f172a !important;
-    }
-
-    /* 4. SIDEBAR TEXT (White) */
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
-    [data-testid="stSidebar"] div, [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stRadio div {
         color: #ffffff !important;
     }
+    
+    /* 3. SIDEBAR (Keep Brand Green) */
+    [data-testid="stSidebar"] {
+        background-color: #0e3b28 !important;
+        border-right: 1px solid #064e3b;
+    }
+    [data-testid="stSidebar"] * {
+        color: white !important;
+    }
 
-    /* 5. FEATURE CARDS (Grey Box with Dark Text) */
+    /* 4. GLASSMORPHISM CARDS (See-through boxes) */
     .feature-card {
-        background-color: #f1f5f9;
+        background-color: rgba(255, 255, 255, 0.05); /* 5% White Transparency */
         padding: 20px;
         border-radius: 10px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         text-align: center;
         margin-bottom: 10px;
+        backdrop-filter: blur(5px); /* Blurs the background behind the card */
     }
     .feature-card h3 {
-        color: #0f172a !important;
+        color: #22c55e !important; /* Bright Green Text for Headers */
         margin-top: 0;
     }
     .feature-card p {
-        color: #475569 !important;
+        color: #e2e8f0 !important; /* Light Grey for body text */
     }
 
-    /* 6. INPUT FIELDS (White Background, Dark Text) */
+    /* 5. INPUT FIELDS (Clean White for usability) */
     .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div {
-        background-color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
         color: #0f172a !important;
-        border: 1px solid #cbd5e1;
+        border: none;
     }
     
-    /* 7. BUTTONS (Green Accent) */
+    /* 6. BUTTONS */
     .stButton>button {
         width: 100%;
-        background-color: #22c55e !important; /* Light Green from Logo */
+        background-color: #22c55e !important;
         color: white !important;
         border: none;
         padding: 0.6rem 1rem;
-        border-radius: 8px;
         font-weight: bold;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
     .stButton>button:hover { background-color: #16a34a !important; }
 
-    /* 8. HIDE DEFAULT MENUS */
+    /* HIDE MENU */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -84,13 +81,11 @@ st.markdown("""
 
 # --- 3. SIDEBAR NAVIGATION ---
 with st.sidebar:
-    # LOGO: This looks for "logo.jpg" in your GitHub root folder.
-    # If the image is broken, check the spelling in your GitHub repo exactly.
+    # Looking for logo.jpg
     try:
         st.image("logo.jpg", use_container_width=True)
     except:
-        # Fallback if image fails to load
-        st.error("Logo not found. Please upload 'logo.jpg' to GitHub.")
+        st.error("Logo not found. Ensure 'logo.jpg' is in GitHub.")
     
     st.markdown("---")
     menu = st.radio("Navigation", ["🏠 Home", "🛠️ Start Assessment", "🚛 My Fleet"])
@@ -103,9 +98,9 @@ with st.sidebar:
 if menu == "🏠 Home":
     # HERO SECTION
     st.markdown("""
-    <div style="text-align: center; padding: 40px 0;">
-        <h1 style="font-size: 3rem; color: #0f172a !important;">Move Heavy Loads, <span style="color: #16a34a !important;">Faster.</span></h1>
-        <p style="font-size: 1.2rem; color: #475569 !important;">
+    <div style="text-align: center; padding: 60px 0;">
+        <h1 style="font-size: 3.5rem; text-shadow: 0 4px 6px rgba(0,0,0,0.3);">Move Heavy Loads, <span style="color: #22c55e !important;">Faster.</span></h1>
+        <p style="font-size: 1.3rem; opacity: 0.9;">
             The automated compliance tool for Class 1 Heavy Vehicles. <br>
             Instant bridge checks. 100% Compliant.
         </p>
@@ -141,7 +136,7 @@ if menu == "🏠 Home":
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # CALL TO ACTION
+    # CTA
     col_cta1, col_cta2, col_cta3 = st.columns([1, 2, 1])
     with col_cta2:
         st.info("👈 Select 'Start Assessment' in the sidebar to begin.")
@@ -150,6 +145,7 @@ if menu == "🏠 Home":
 elif menu == "🛠️ Start Assessment":
     st.title("New Movement Assessment")
     
+    # Transparent Container for Inputs
     with st.container():
         st.markdown("### 1. Vehicle Configuration")
         c1, c2 = st.columns(2)
@@ -167,43 +163,4 @@ elif menu == "🛠️ Start Assessment":
         # LOGIC
         flags = []
         status = "Approved"
-        color = "#22c55e" # Green
-        
-        if gcm > 42.5:
-            flags.append("Mass > 42.5t (Bridge Check Req)")
-            status = "Conditional"
-            color = "#f59e0b" # Orange
-        if width > 2.5:
-            flags.append("Oversize Width (>2.5m)")
-            status = "Conditional"
-            color = "#f59e0b"
-        if height > 4.9:
-            flags.append("Height > 4.9m (Power Check)")
-            status = "Referral"
-            color = "#ef4444" # Red
-            
-        # RESULTS CARD
-        st.markdown("---")
-        r1, r2 = st.columns(2)
-        with r1:
-            st.metric("Status", status)
-        with r2:
-            st.metric("NHVR Fee", "$91.00")
-            
-        if len(flags) == 0: flags.append("✅ General Access Compliant")
-        html_flags = "".join([f"<li>{f}</li>" for f in flags])
-        
-        st.markdown(f"""
-        <div style="background-color: white; padding: 20px; border-left: 6px solid {color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 20px;">
-            <h4 style="margin:0; color: #0f172a !important;">Analysis Details</h4>
-            <ul style="color: #0f172a !important;">{html_flags}</ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if color != "#22c55e":
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.link_button("🚀 SUBMIT APPLICATION ($140)", "https://buy.stripe.com/test_123")
-
-elif menu == "🚛 My Fleet":
-    st.title("My Fleet")
-    st.info("Log in to view your saved assets.")
+        color = "#
