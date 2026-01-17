@@ -99,6 +99,32 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
     }
+
+    /* CUSTOM SUBSCRIBE BUTTON */
+    .subscribe-btn-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    .subscribe-btn {
+        display: inline-block;
+        background: linear-gradient(45deg, #f59e0b, #d97706); /* Gold/Orange Gradient */
+        color: white !important;
+        padding: 12px 30px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .subscribe-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+        color: white !important;
+        text-decoration: none;
+    }
     
     #MainMenu, footer, header {visibility: hidden;}
     </style>
@@ -139,7 +165,7 @@ with st.sidebar:
 
 # --- 6. MAIN CONTENT ---
 
-# --- SCENARIO A: LOGIN SCREEN (THE FIX) ---
+# --- SCENARIO A: LOGIN SCREEN ---
 if not st.session_state.logged_in:
     st.markdown("""
     <div style="text-align: center; padding: 40px 0;">
@@ -150,16 +176,12 @@ if not st.session_state.logged_in:
     </div>
     """, unsafe_allow_html=True)
     
-    # CENTRAL COLUMN FOR LOGIN
     c1, c2, c3 = st.columns([1, 1, 1])
     with c2:
-        # WE USE ST.FORM INSTEAD OF HTML DIVS
         with st.form("login_form"):
             st.subheader("Client Login")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
-            
-            # Form submit button allows "Enter" key to work
             submitted = st.form_submit_button("Login")
             
             if submitted:
@@ -170,15 +192,23 @@ if not st.session_state.logged_in:
                     st.error("Invalid credentials.")
         
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center;'>Don't have an account?</div>", unsafe_allow_html=True)
-        # STRIPE SUBSCRIPTION BUTTON
-        st.link_button("💳 SUBSCRIBE NOW ($99/mo)", "https://stripe.com")
+        st.markdown("<div style='text-align: center; margin-bottom: 10px;'>Don't have an account?</div>", unsafe_allow_html=True)
+        
+        # --- NEW CENTERED BUTTON ---
+        # We replace st.link_button with a custom HTML structure to guarantee centering and style.
+        # Replace '#' with your actual Stripe Link.
+        st.markdown("""
+            <div class="subscribe-btn-container">
+                <a href="#" class="subscribe-btn" target="_blank">
+                    💳 SUBSCRIBE NOW ($99/mo)
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
 
 # --- SCENARIO B: DASHBOARD (LOGGED IN) ---
 else:
     if "Dashboard" in menu:
-        # HERO
         st.markdown("""
         <div style="text-align: center; padding: 20px 0 30px 0;">
             <h1 style="font-size: 3rem;">Operations Dashboard</h1>
@@ -186,7 +216,6 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        # METRICS
         c1, c2, c3, c4 = st.columns(4)
         with c1: st.markdown('<div class="glass-card" style="text-align:center;"><h3>98%</h3><p>Pre-Approval Accuracy</p></div>', unsafe_allow_html=True)
         with c2: st.markdown('<div class="glass-card" style="text-align:center;"><h3>< 2s</h3><p>Calculation Speed</p></div>', unsafe_allow_html=True)
@@ -204,7 +233,6 @@ else:
 
     elif "Check" in menu:
         st.title("Compliance Check")
-        
         with st.container():
             c1, c2, c3 = st.columns(3)
             with c1:
@@ -216,18 +244,14 @@ else:
             with c3:
                 width = st.number_input("Width (m)", 2.0, 10.0, 2.5)
                 height = st.number_input("Height (m)", 2.0, 8.0, 4.3)
-
         st.markdown("<br>", unsafe_allow_html=True)
-        
         if st.button("CHECK COMPLIANCE"):
             with st.spinner("Analyzing..."):
                 import time
                 time.sleep(0.5)
-                
                 flags = []
                 status = "APPROVED"
                 color = "#22c55e"
-                
                 if gcm > 42.5:
                     flags.append(f"⚠️ Mass ({gcm}t) > General Access Limit")
                     status = "CONDITIONAL"
@@ -240,7 +264,6 @@ else:
                     flags.append(f"⛔ Height ({height}m) exceeds clearway max.")
                     status = "REFERRAL"
                     color = "#ef4444"
-                    
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 10px; padding: 20px; border-left: 10px solid {color}; margin-top: 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
