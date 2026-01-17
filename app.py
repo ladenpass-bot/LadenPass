@@ -194,10 +194,10 @@ if not st.session_state.logged_in:
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='text-align: center; margin-bottom: 10px;'>Don't have an account?</div>", unsafe_allow_html=True)
         
-        # --- PASTE YOUR STRIPE LINK BELOW ---
+        # --- YOUR LIVE STRIPE LINK IS NOW INTEGRATED HERE ---
         st.markdown("""
             <div class="subscribe-btn-container">
-                <a href="YOUR_STRIPE_LINK_HERE" class="subscribe-btn" target="_blank">
+                <a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="subscribe-btn" target="_blank">
                     💳 SUBSCRIBE NOW ($99/mo)
                 </a>
             </div>
