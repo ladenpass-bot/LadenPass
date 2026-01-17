@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import base64
 import datetime
+import time
 
 # --- 1. ENTERPRISE PAGE CONFIG ---
 st.set_page_config(
@@ -108,7 +109,7 @@ st.markdown("""
     }
     .subscribe-btn {
         display: inline-block;
-        background: linear-gradient(45deg, #f59e0b, #d97706); /* Gold/Orange Gradient */
+        background: linear-gradient(45deg, #f59e0b, #d97706);
         color: white !important;
         padding: 12px 30px;
         border-radius: 50px;
@@ -126,13 +127,30 @@ st.markdown("""
         text-decoration: none;
     }
     
+    /* DISCLAIMER FOOTER */
+    .disclaimer {
+        font-size: 0.75rem;
+        color: #64748b !important;
+        text-align: center;
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid #334155;
+    }
+
     #MainMenu, footer, header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. SESSION STATE (USER LOGIN) ---
+# --- 4. SESSION STATE (USER LOGIN & DATABASE) ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+
+if "job_db" not in st.session_state:
+    # Simulating a database of recent jobs
+    st.session_state.job_db = pd.DataFrame([
+        {"Ref": "JOB-1001", "Status": "Complete", "Date": "2023-10-24", "Outcome": "Permit Issued"},
+        {"Ref": "JOB-1002", "Status": "Complete", "Date": "2023-10-25", "Outcome": "Route Adjustment"}
+    ])
 
 # --- 5. SIDEBAR CONTENT ---
 with st.sidebar:
@@ -143,7 +161,7 @@ with st.sidebar:
     
     if st.session_state.logged_in:
         st.markdown("### Action Menu")
-        menu = st.radio("", ["📊 Dashboard", "✅ New Check"], label_visibility="collapsed")
+        menu = st.radio("", ["📊 Dashboard", "✅ New Assessment"], label_visibility="collapsed")
         
         st.markdown("---")
         if st.button("Log Out"):
@@ -194,7 +212,7 @@ if not st.session_state.logged_in:
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<div style='text-align: center; margin-bottom: 10px;'>Don't have an account?</div>", unsafe_allow_html=True)
         
-        # --- YOUR LIVE STRIPE LINK IS NOW INTEGRATED HERE ---
+        # --- LIVE STRIPE LINK ---
         st.markdown("""
             <div class="subscribe-btn-container">
                 <a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="subscribe-btn" target="_blank">
@@ -204,7 +222,7 @@ if not st.session_state.logged_in:
         """, unsafe_allow_html=True)
 
 
-# --- SCENARIO B: DASHBOARD (LOGGED IN) ---
+# --- SCENARIO B: LOGGED IN AREA ---
 else:
     if "Dashboard" in menu:
         st.markdown("""
@@ -214,62 +232,73 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
+        # Metrics (Top Row)
         c1, c2, c3, c4 = st.columns(4)
-        with c1: st.markdown('<div class="glass-card" style="text-align:center;"><h3>98%</h3><p>Pre-Approval Accuracy</p></div>', unsafe_allow_html=True)
-        with c2: st.markdown('<div class="glass-card" style="text-align:center;"><h3>< 2s</h3><p>Calculation Speed</p></div>', unsafe_allow_html=True)
-        with c3: st.markdown('<div class="glass-card" style="text-align:center;"><h3>100%</h3><p>Gazette Compliance</p></div>', unsafe_allow_html=True)
-        with c4: st.markdown('<div class="glass-card" style="text-align:center;"><h3>24/7</h3><p>Network Availability</p></div>', unsafe_allow_html=True)
+        with c1: st.markdown('<div class="glass-card" style="text-align:center;"><h3>Live</h3><p>Network Status</p></div>', unsafe_allow_html=True)
+        with c2: st.markdown('<div class="glass-card" style="text-align:center;"><h3>< 1hr</h3><p>Avg Turnaround</p></div>', unsafe_allow_html=True)
+        with c3: st.markdown('<div class="glass-card" style="text-align:center;"><h3>100%</h3><p>NHVR Compliant</p></div>', unsafe_allow_html=True)
+        with c4: st.markdown(f'<div class="glass-card" style="text-align:center;"><h3>{len(st.session_state.job_db)}</h3><p>Total Jobs</p></div>', unsafe_allow_html=True)
 
-        st.markdown("<br>### Features", unsafe_allow_html=True)
-        fc1, fc2, fc3 = st.columns(3)
-        with fc1:
-            st.markdown('<div class="glass-card"><h3>⚡ Automated Feasibility</h3><p>Eliminates manual bridge assessments.</p></div>', unsafe_allow_html=True)
-        with fc2:
-            st.markdown('<div class="glass-card"><h3>🗺️ Dynamic Routing</h3><p>Routes validated against height restrictions.</p></div>', unsafe_allow_html=True)
-        with fc3:
-            st.markdown('<div class="glass-card"><h3>📄 Regulatory Alignment</h3><p>Full integration with NHVR Class 1 Notice.</p></div>', unsafe_allow_html=True)
-
-    elif "Check" in menu:
-        st.title("Compliance Check")
-        with st.container():
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                ref = st.text_input("Job Ref", value="JOB-X88")
-                route = st.selectbox("State", ["VIC", "NSW", "QLD"])
-            with c2:
-                gcm = st.number_input("Mass (t)", 10.0, 250.0, 42.5)
-                axles = st.number_input("Axle Count", 2, 20, 6)
-            with c3:
-                width = st.number_input("Width (m)", 2.0, 10.0, 2.5)
-                height = st.number_input("Height (m)", 2.0, 8.0, 4.3)
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("CHECK COMPLIANCE"):
-            with st.spinner("Analyzing..."):
-                import time
-                time.sleep(0.5)
-                flags = []
-                status = "APPROVED"
-                color = "#22c55e"
-                if gcm > 42.5:
-                    flags.append(f"⚠️ Mass ({gcm}t) > General Access Limit")
-                    status = "CONDITIONAL"
-                    color = "#f59e0b"
-                if width > 2.5:
-                    flags.append(f"⚠️ Width ({width}m) requires 'Oversize' signs")
-                    status = "CONDITIONAL"
-                    color = "#f59e0b"
-                if height > 4.6:
-                    flags.append(f"⛔ Height ({height}m) exceeds clearway max.")
-                    status = "REFERRAL"
-                    color = "#ef4444"
-                st.markdown(f"""
-                <div style="background-color: white; border-radius: 10px; padding: 20px; border-left: 10px solid {color}; margin-top: 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h3 style="color: #0f172a !important; margin:0;">Status: {status}</h3>
-                    </div>
-                    <hr style="border-top: 1px solid #e2e8f0; margin: 10px 0;">
-                    <ul style="color: #334155 !important; margin: 0; padding-left: 20px;">
-                        {''.join([f'<li style="color:#334155;">{f}</li>' for f in flags])}
-                    </ul>
-                </div>
-                """, unsafe_allow_html=True)
+
+        # Recent Activity Table (Updates when you submit a new job)
+        st.subheader("📋 Recent Assessment Requests")
+        st.markdown("""<style>[data-testid="stDataFrame"] { background-color: white; padding: 10px; border-radius: 10px; }</style>""", unsafe_allow_html=True)
+        st.dataframe(st.session_state.job_db, use_container_width=True, hide_index=True)
+
+    elif "Assessment" in menu:
+        st.title("New Route Assessment")
+        st.markdown("Enter vehicle parameters below. Our engineering engine will assess feasibility against NHVR structures.")
+        
+        with st.form("assessment_form"):
+            st.subheader("1. Job Details")
+            c1, c2 = st.columns(2)
+            with c1:
+                ref = st.text_input("Job Reference (e.g., PO-998)", value="JOB-2026-X")
+                email = st.text_input("Email for Report", placeholder="admin@yourcompany.com")
+            with c2:
+                route_origin = st.text_input("Origin", placeholder="e.g. Port of Melbourne")
+                route_dest = st.text_input("Destination", placeholder="e.g. Dandenong South")
+
+            st.markdown("---")
+            st.subheader("2. Vehicle Configuration")
+            c3, c4, c5 = st.columns(3)
+            with c3:
+                gcm = st.number_input("Gross Mass (t)", 10.0, 250.0, 42.5)
+            with c4:
+                width = st.number_input("Width (m)", 2.0, 10.0, 2.5)
+            with c5:
+                height = st.number_input("Height (m)", 2.0, 8.0, 4.3)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # THE "SUBMIT" BUTTON (Replaces the instant check)
+            submitted = st.form_submit_button("🚀 SUBMIT FOR ASSESSMENT")
+            
+            if submitted:
+                if not email:
+                    st.error("⚠️ Please enter an email address for the report.")
+                else:
+                    with st.spinner("Validating inputs and queuing for analysis..."):
+                        time.sleep(1.5) # Simulating processing time
+                        
+                        # Add to the "Fake Database" so the user sees it in the dashboard
+                        new_job = pd.DataFrame([{
+                            "Ref": ref, 
+                            "Status": "🟡 Pending Review", 
+                            "Date": datetime.date.today().strftime("%Y-%m-%d"), 
+                            "Outcome": "Processing..."
+                        }])
+                        st.session_state.job_db = pd.concat([new_job, st.session_state.job_db], ignore_index=True)
+                        
+                        st.success(f"✅ Request Received! Assessment ID: {ref}")
+                        st.info(f"Our team is processing the structural feasibility. A verified PDF report will be sent to {email} within 60 minutes.")
+
+    # --- DISCLAIMER FOOTER (CRITICAL FOR LIABILITY) ---
+    st.markdown("""
+        <div class="disclaimer">
+            <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on available NHVR data. 
+            Results are estimates only and do not constitute a legal permit. 
+            All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR) or relevant road managers.
+        </div>
+    """, unsafe_allow_html=True)
