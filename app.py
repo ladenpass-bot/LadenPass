@@ -6,7 +6,7 @@ import time
 
 # --- 1. ENTERPRISE PAGE CONFIG ---
 st.set_page_config(
-    page_title="LadenPass | Enterprise Platform",
+    page_title="LadenPass | Automated Compliance",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -31,7 +31,7 @@ st.markdown("""
     /* GLOBAL THEME */
     .stApp {
         background-color: #0f172a; 
-        background-image: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.94)), 
+        background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
         url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
         background-size: cover;
         background-position: center;
@@ -64,16 +64,26 @@ st.markdown("""
 
     /* GLASS CARDS */
     .glass-card {
-        background-color: rgba(255, 255, 255, 0.08);
+        background-color: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 25px;
         border-radius: 10px;
         margin-bottom: 20px;
         height: 100%;
-        text-align: center;
     }
     
+    /* SALES BULLET POINTS */
+    .sales-point {
+        background-color: rgba(6, 78, 59, 0.4); /* Dark Green Tint */
+        border-left: 4px solid #4ade80;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 0 8px 8px 0;
+    }
+    .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; }
+    .sales-point p { margin: 5px 0 0 0 !important; font-size: 0.95rem !important; opacity: 0.9; }
+
     /* INPUTS & BUTTONS */
     .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
         background-color: #ffffff !important;
@@ -106,20 +116,22 @@ st.markdown("""
     .subscribe-btn-container {
         display: flex;
         justify-content: center;
-        margin-top: 10px;
+        margin-top: 15px;
     }
     .subscribe-btn {
         display: inline-block;
         background: linear-gradient(45deg, #f59e0b, #d97706);
         color: white !important;
-        padding: 12px 30px;
+        padding: 15px 40px;
         border-radius: 50px;
         text-decoration: none;
         font-weight: bold;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
         transition: all 0.3s ease;
         border: 1px solid rgba(255,255,255,0.2);
+        width: 100%;
+        text-align: center;
     }
     .subscribe-btn:hover {
         transform: translateY(-2px);
@@ -137,6 +149,12 @@ st.markdown("""
         padding-top: 20px;
         border-top: 1px solid #334155;
     }
+    
+    /* MOBILE RESPONSIVENESS FIX */
+    @media (max-width: 768px) {
+        div[data-testid="column"] { width: 100% !important; flex: 1 1 auto !important; min-width: 100% !important; }
+        h1 { font-size: 2.5rem !important; }
+    }
 
     #MainMenu, footer, header {visibility: hidden;}
     </style>
@@ -144,50 +162,37 @@ st.markdown("""
 
 # --- 4. AUTOMATED ENGINE LOGIC (NO MANUAL WORK) ---
 def check_compliance(gcm, axles, width, height):
-    """
-    Automated logic based on NHVR General Mass Limits (GML) 
-    and Dimension requirements. Returns status dictionary.
-    """
     report = {
         "status": "APPROVED",
-        "color": "#22c55e", # Green
+        "color": "#22c55e", 
         "issues": [],
         "permit_type": "General Access (No Permit Required)"
     }
-
-    # A. DIMENSION CHECKS
     if width > 2.5:
         report["issues"].append(f"⚠️ **Width ({width}m):** Exceeds 2.5m General Access limit.")
         report["permit_type"] = "Class 1 Oversize Permit Required"
         report["status"] = "CONDITIONAL"
-        report["color"] = "#f59e0b" # Orange
-
+        report["color"] = "#f59e0b"
     if height > 4.3:
         report["issues"].append(f"⛔ **Height ({height}m):** Exceeds 4.3m standard clearance.")
         report["permit_type"] = "High Productivity / Oversize Permit"
         report["status"] = "NON-COMPLIANT"
-        report["color"] = "#ef4444" # Red
-
-    # B. MASS CHECKS (Simplified GML)
+        report["color"] = "#ef4444" 
     gml_limit = 42.5
     if axles >= 7: gml_limit = 50.0 
     if axles >= 9: gml_limit = 62.5 
-
     if gcm > gml_limit:
         report["issues"].append(f"⚠️ **Mass ({gcm}t):** Exceeds {gml_limit}t General Access limit.")
         if report["status"] != "NON-COMPLIANT":
             report["status"] = "CONDITIONAL"
             report["permit_type"] = "Class 1 Overmass Permit Required"
             report["color"] = "#f59e0b"
-
-    # C. TIER 1 BRIDGE FORMULA (Simplified)
     avg_axle_load = gcm / axles
-    if avg_axle_load > 9.0: # Standard axle limit
+    if avg_axle_load > 9.0: 
         report["issues"].append(f"⛔ **Axle Load ({avg_axle_load:.1f}t):** Exceeds safety limits (>9t/axle).")
         report["status"] = "CRITICAL FAIL"
         report["color"] = "#ef4444"
         report["permit_type"] = "Structural Assessment Required"
-
     return report
 
 
@@ -205,12 +210,10 @@ with st.sidebar:
     if st.session_state.logged_in:
         st.markdown("### Action Menu")
         menu = st.radio("", ["📊 Dashboard", "✅ Run Auto-Check"], label_visibility="collapsed")
-        
         st.markdown("---")
         if st.button("Log Out"):
             st.session_state.logged_in = False
             st.rerun()
-            
         st.success("🟢 System Online")
     else:
         st.info("🔒 Secure Access")
@@ -226,21 +229,44 @@ with st.sidebar:
 
 # --- 7. MAIN CONTENT ---
 
-# >>> VIEW 1: LOGIN / SALES PAGE <<<
+# >>> VIEW 1: THE NEW SALES / LANDING PAGE <<<
 if not st.session_state.logged_in:
+    # --- HERO HEADER ---
     st.markdown("""
-    <div style="text-align: center; padding: 40px 0;">
-        <h1 style="font-size: 3.5rem;">LadenPass Enterprise</h1>
-        <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto; opacity: 0.9;">
-            The automated network access platform for Class 1 Heavy Vehicles.
-        </p>
+    <div style="text-align: left; padding: 20px 0 40px 0;">
+        <h1 style="font-size: 4rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 10px;">LadenPass Enterprise</h1>
+        <h2 style="color: #4ade80 !important; font-weight: 300; font-size: 1.8rem; margin-top: 0;">
+            Stop Guessing. Start Hauling.
+        </h2>
     </div>
     """, unsafe_allow_html=True)
     
-    c1, c2, c3 = st.columns([1, 1, 1])
-    with c2:
+    # --- SPLIT LAYOUT: SALES PITCH vs LOGIN ---
+    c_sales, c_login = st.columns([1.5, 1])
+    
+    with c_sales:
+        st.markdown("### Why use LadenPass?")
+        st.markdown("""
+        <div class="sales-point">
+            <h4>⚡ Instant Feasibility Checks</h4>
+            <p>Know if you are compliant in 2 seconds. Our engine calculates GML, Width, and Height limits instantly against NHVR gazettes.</p>
+        </div>
+        <div class="sales-point">
+            <h4>🏗️ Bridge Formula Calculator</h4>
+            <p>Avoid structural failures. We automatically check your axle spacing and mass distribution against Tier 1 safety standards.</p>
+        </div>
+        <div class="sales-point">
+            <h4>💰 Avoid Expensive Fines</h4>
+            <p>Don't risk a $5,000 fine for being 200kg over. Validate your load before it hits the weighbridge.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.info("ℹ️ **Trusted by:** Independent Operators, Fleet Managers, and Compliance Officers across Australia.")
+
+    with c_login:
         with st.form("login_form"):
-            st.subheader("Client Login")
+            st.subheader("Subscriber Login")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             submitted = st.form_submit_button("Login")
@@ -252,14 +278,12 @@ if not st.session_state.logged_in:
                 else:
                     st.error("Invalid credentials.")
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div style='text-align: center; margin-bottom: 10px;'>Don't have an account?</div>", unsafe_allow_html=True)
-        
-        # --- YOUR LIVE STRIPE LINK ---
+        # --- THE CONVERTING CALL TO ACTION ---
         st.markdown("""
             <div class="subscribe-btn-container">
                 <a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="subscribe-btn" target="_blank">
-                    💳 SUBSCRIBE NOW ($99/mo)
+                    UNLOCK INSTANT ACCESS ($99/mo)
+                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 5px;">30-Day Money Back Guarantee</div>
                 </a>
             </div>
         """, unsafe_allow_html=True)
@@ -309,11 +333,8 @@ else:
         if st.button("RUN AUTOMATED CHECK"):
             with st.spinner("Calculating Physics & Regulations..."):
                 time.sleep(1) # Visual effect
-                
-                # --- RUN THE REAL AUTOMATED CODE ---
                 result = check_compliance(gcm, axles, width, height)
                 
-                # --- DISPLAY RESULT CARD ---
                 st.markdown(f"""
                 <div style="background-color: white; border-radius: 10px; padding: 25px; border-left: 10px solid {result['color']}; margin-top: 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -331,7 +352,6 @@ else:
                     
                 st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- DISCLAIMER FOOTER ---
     st.markdown("""
         <div class="disclaimer">
             <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on standard General Mass Limits (GML). 
