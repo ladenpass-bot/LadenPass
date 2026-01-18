@@ -30,7 +30,7 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. PROFESSIONAL STYLING (RESTORED SCANIA BACKGROUND) ---
+# --- 4. PROFESSIONAL STYLING ---
 st.markdown("""
     <style>
     /* 1. SIDEBAR LOCK */
@@ -43,7 +43,6 @@ st.markdown("""
         height: 100vh;
         overflow-y: auto;
         background-color: #0f172a; 
-        /* Restored Scania Truck Background */
         background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
         url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
         background-size: cover;
@@ -58,70 +57,19 @@ st.markdown("""
     }
 
     /* 3. ENHANCED TYPOGRAPHY */
-    h1 { 
-        color: #ffffff !important; 
-        font-size: 3.5rem !important; 
-        font-weight: 800 !important; 
-        margin-bottom: 10px !important; 
-        letter-spacing: -1px;
-    }
-    h2 { 
-        color: #4ade80 !important; 
-        font-size: 2rem !important; 
-        margin-top: 0px !important; 
-        font-weight: 400 !important; 
-    }
-    h3 { 
-        color: #ffffff !important; 
-        font-size: 1.5rem !important; 
-        font-weight: 600 !important; 
-        margin-bottom: 10px !important;
-    }
-    p, li, label, div { 
-        color: #cbd5e1 !important; 
-        font-size: 1.1rem !important; 
-        line-height: 1.6 !important;
-    }
+    h1 { color: #ffffff !important; font-size: 3.5rem !important; font-weight: 800 !important; margin-bottom: 10px !important; letter-spacing: -1px; }
+    h2 { color: #4ade80 !important; font-size: 2rem !important; margin-top: 0px !important; font-weight: 400 !important; }
+    h3 { color: #ffffff !important; font-size: 1.5rem !important; font-weight: 600 !important; margin-bottom: 10px !important; }
+    p, li, label, div { color: #cbd5e1 !important; font-size: 1.1rem !important; line-height: 1.6 !important; }
     span { font-size: inherit; }
     
     /* 4. SIDEBAR WIDGETS */
-    .sidebar-card {
-        background-color: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    .user-badge {
-        background-color: #f59e0b;
-        color: white;
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
-    .status-dot {
-        height: 12px;
-        width: 12px;
-        background-color: #4ade80;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 10px;
-        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
-        animation: pulse-green 2s infinite;
-    }
+    .sidebar-card { background-color: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .user-badge { background-color: #f59e0b; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+    .status-dot { height: 12px; width: 12px; background-color: #4ade80; border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); animation: pulse-green 2s infinite; }
 
-    /* 5. MAIN CONTENT COMPONENTS */
-    .glass-card, [data-testid="stForm"], .control-panel, .metric-card {
-        background-color: rgba(15, 23, 42, 0.75); 
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        margin-bottom: 25px;
-    }
+    /* 5. COMPONENTS */
+    .glass-card, [data-testid="stForm"], .control-panel, .metric-card { background-color: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); margin-bottom: 25px; }
 
     /* METRICS */
     .metric-value { font-size: 2.5rem; font-weight: 800; color: #ffffff; margin: 5px 0; }
@@ -129,75 +77,25 @@ st.markdown("""
     .metric-delta { font-size: 0.9rem; margin-top: 5px; }
     
     /* 6. INPUTS & BUTTONS */
-    .stTextInput input, .stNumberInput input {
-        background-color: #1e293b !important;
-        color: white !important;
-        border: 1px solid #334155;
-        border-radius: 6px;
-        padding: 12px 15px;
-        font-size: 1.1rem !important;
-    }
-    .stButton > button {
-        background-color: #10b981 !important;
-        color: white !important;
-        border: none;
-        font-weight: 700;
-        font-size: 1.1rem;
-        width: 100%;
-        padding: 15px;
-        border-radius: 6px;
-        text-transform: uppercase;
-        margin-top: 10px;
-    }
+    .stTextInput input, .stNumberInput input { background-color: #1e293b !important; color: white !important; border: 1px solid #334155; border-radius: 6px; padding: 12px 15px; font-size: 1.1rem !important; }
+    .stButton > button { background-color: #10b981 !important; color: white !important; border: none; font-weight: 700; font-size: 1.1rem; width: 100%; padding: 15px; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
     .stButton > button:hover { background-color: #059669 !important; }
 
-    /* 7. REMOVE DECORATIONS */
+    /* 7. CHECKBOX STYLING */
+    [data-testid="stCheckbox"] label { font-size: 1.1rem !important; }
+
+    /* 8. MISC */
     header, footer, #MainMenu {visibility: hidden;}
-    
-    /* 8. DATAFRAME */
     [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 1rem !important; }
-    
-    /* 9. SUBSCRIBE BUTTON */
     .subscribe-btn-container { display: flex; justify-content: center; margin-top: 25px; }
-    .subscribe-btn {
-        display: inline-block;
-        background: linear-gradient(45deg, #f59e0b, #ea580c);
-        color: white !important;
-        padding: 15px 50px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 1.2rem;
-        border: 1px solid rgba(255,255,255,0.2);
-        width: 100%;
-        text-align: center;
-    }
+    .subscribe-btn { display: inline-block; background: linear-gradient(45deg, #f59e0b, #ea580c); color: white !important; padding: 15px 50px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.2); width: 100%; text-align: center; }
     
-    /* 10. ANIMATIONS */
-    @keyframes pulse-green {
-        0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
-        70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-    }
+    @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
     
-    /* 11. SALES POINTS */
-    .sales-point {
-        background-color: rgba(6, 78, 59, 0.6);
-        border-left: 5px solid #4ade80;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-    }
+    .sales-point { background-color: rgba(6, 78, 59, 0.6); border-left: 5px solid #4ade80; padding: 20px; margin-bottom: 20px; border-radius: 4px; }
     .sales-point h4 { margin: 0 !important; font-size: 1.3rem !important; color: white !important; font-weight: bold !important; }
     
-    /* 12. TRUST BAR */
-    .trust-bar {
-        margin-top: 50px;
-        display: flex;
-        justify-content: space-around;
-        padding: 20px 10px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-    }
+    .trust-bar { margin-top: 50px; display: flex; justify-content: space-around; padding: 20px 10px; border-top: 1px solid rgba(255,255,255,0.1); }
     .trust-item { text-align: center; opacity: 1.0; }
     .trust-icon { font-size: 1.8rem; display: block; margin-bottom: 10px; color: #f59e0b; }
     .trust-label { font-weight: bold; color: white !important; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
@@ -205,8 +103,36 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 5. LOGIC ---
-def check_compliance(gcm, axles, width, height):
+# --- 5. LOGIC & AUTOMATION ---
+
+def get_required_equipment(width, length, is_night):
+    """
+    Automates the logic for required safety equipment based on NHVR standards.
+    """
+    equipment = []
+    
+    # 1. WIDTH LOGIC
+    if width > 2.5:
+        equipment.append("⚠️ 'OVERSIZE' Sign (Front & Rear)")
+        equipment.append("🚩 4x Warning Flags (Brightly colored, corners)")
+        equipment.append("🔦 Low Beam Headlights (On during day)")
+        
+    if width > 3.0:
+        equipment.append("🚨 1x Rotating Amber Beacon (Cab mounted)")
+        equipment.append("↔️ Delineators (Side markers)")
+
+    # 2. LENGTH LOGIC
+    if length > 22.0: # Example length for Long Vehicle
+        equipment.append("🚛 'LONG VEHICLE' Sign (Rear)")
+
+    # 3. NIGHT LOGIC
+    if is_night and width > 2.5:
+        equipment.append("💡 Side Marker Lights (Yellow/Amber every 1.5m)")
+        equipment.append("🔦 Clearance Lights (Front/Rear edges)")
+
+    return equipment
+
+def check_compliance(gcm, axles, width, height, length, is_night):
     timestamp = datetime.datetime.now().strftime("%H:%M:%S")
     report = {
         "status": "APPROVED",
@@ -215,9 +141,11 @@ def check_compliance(gcm, axles, width, height):
         "issues": [],
         "permit_type": "General Access",
         "timestamp": timestamp,
-        "details": f"{gcm}t / {axles} Axles"
+        "details": f"{gcm}t / {axles} Axles",
+        "equipment": get_required_equipment(width, length, is_night) # Get automated equipment list
     }
     
+    # COMPLIANCE LOGIC
     if width > 2.5:
         report["issues"].append(f"Width ({width}m) > 2.5m")
         report["permit_type"] = "Class 1 Oversize"
@@ -253,24 +181,21 @@ def check_compliance(gcm, axles, width, height):
 
     st.session_state.history.insert(0, {
         "Time": timestamp,
-        "Configuration": f"{gcm}t on {axles} Axles",
-        "Dimensions": f"{width}m x {height}m",
+        "Configuration": f"{gcm}t | {width}m x {length}m",
         "Status": report["status"],
-        "Permit Required": report["permit_type"]
+        "Permit": report["permit_type"]
     })
     
     return report
 
 # --- 6. SIDEBAR ---
 with st.sidebar:
-    # A. LOGO
     if logo_b64:
         st.markdown(f"""<div class="logo-container" style="background:white; padding:10px; border-radius:8px; margin-bottom:20px; text-align:center;"><img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;"></div>""", unsafe_allow_html=True)
     else:
         st.markdown("""<div class="logo-container" style="background:white; padding:10px; border-radius:8px; margin-bottom:20px; text-align:center;"><p style="color:#064e3b !important; font-size: 20px; font-weight: bold; margin: 0;">LadenPass</p></div>""", unsafe_allow_html=True)
     
     if st.session_state.logged_in:
-        # B. USER PROFILE CARD
         user_role = "ADMIN" if st.session_state.user_type == "Admin" else "TRIAL"
         st.markdown(f"""
         <div class="sidebar-card">
@@ -284,11 +209,9 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        # C. NAVIGATION
         st.markdown("<p style='font-size:0.9rem; color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-top:25px; margin-bottom:15px;'>MENU</p>", unsafe_allow_html=True)
         menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
         
-        # D. SYSTEM STATUS
         st.markdown("""
         <div class="sidebar-card" style="margin-top:25px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -301,7 +224,6 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        # E. LOGOUT
         st.markdown("---")
         if st.button("LOG OUT"):
             st.session_state.logged_in = False
@@ -310,7 +232,6 @@ with st.sidebar:
             st.rerun()
 
     else:
-        # LANDING PAGE SIDEBAR
         st.markdown("""<div style="background-color:#042f2e; border-left:4px solid #10b981; padding:15px; border-radius:4px; color:#94a3b8; font-size:1rem; margin-bottom:25px;"><span>🔒</span> <strong>Secure Access</strong></div>""", unsafe_allow_html=True)
         st.markdown("""<div style="background-color:rgba(6,78,59,0.4); border:2px solid #10b981; border-radius:8px; padding:20px; text-align:center; animation:pulse-green 2s infinite;"><h3 style="color:white; margin:0 0 10px 0; font-size:1.2rem;">🎉 7-Day Free Trial</h3><p style="color:#cbd5e1; font-size:1rem;">Test drive instantly.</p><div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:4px; margin-top:10px;"><div style="color:#34d399; font-weight:bold; font-size:1rem;">User: guest</div><div style="color:#34d399; font-weight:bold; font-size:1rem;">Pass: tryladenpass</div></div></div>""", unsafe_allow_html=True)
     
@@ -430,20 +351,34 @@ else:
         st.markdown("## 🚛 New Assessment")
         with st.container():
             st.markdown('<div class="control-panel">', unsafe_allow_html=True)
+            
+            # --- ROW 1: Weight & Axles ---
             c1, c2 = st.columns(2)
             with c1:
                 gcm = st.number_input("GCM (t)", 10.0, 200.0, 42.5)
-                axles = st.number_input("Axles", 3, 20, 6)
             with c2:
+                axles = st.number_input("Axles", 3, 20, 6)
+            
+            # --- ROW 2: Dimensions (Added Length for Signage Logic) ---
+            st.markdown("<br>", unsafe_allow_html=True)
+            c3, c4, c5 = st.columns(3)
+            with c3:
                 width = st.number_input("Width (m)", 2.0, 8.0, 2.5)
+            with c4:
                 height = st.number_input("Height (m)", 2.0, 6.0, 4.3)
+            with c5:
+                length = st.number_input("Length (m)", 12.0, 50.0, 19.0) # New field
+            
+            # --- ROW 3: Context ---
+            st.markdown("<br>", unsafe_allow_html=True)
+            is_night = st.checkbox("🌙 Night Travel? (Requires additional lighting)")
             
             st.markdown("<br>", unsafe_allow_html=True)
             
             if st.button("RUN COMPLIANCE CHECK"):
                 with st.spinner("Analyzing Physics & Regulations..."):
                     time.sleep(0.5)
-                    result = check_compliance(gcm, axles, width, height)
+                    result = check_compliance(gcm, axles, width, height, length, is_night)
                     
                     st.markdown(f"""
                     </div>
@@ -461,12 +396,22 @@ else:
                         <hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
                     """, unsafe_allow_html=True)
                     
+                    # 1. SHOW COMPLIANCE ISSUES
                     if result['issues']:
+                        st.markdown("**⛔ Compliance Breaches:**")
                         for issue in result['issues']:
                             st.markdown(f"<div style='color:#ef4444; margin-bottom:8px; font-size:1.1rem;'>• {issue}</div>", unsafe_allow_html=True)
                     else:
                         st.markdown(f"<div style='color:#166534; margin-top:5px; font-size:1.1rem;'>Configuration meets GML General Access Limits.</div>", unsafe_allow_html=True)
                     
+                    # 2. SHOW REQUIRED EQUIPMENT (NEW FEATURE)
+                    if result['equipment']:
+                        st.markdown("<br>**🛠️ Required Safety Gear (Automated):**", unsafe_allow_html=True)
+                        for item in result['equipment']:
+                            st.markdown(f"<div style='color:#0f172a; margin-bottom:5px; font-weight:500; font-size:1.1rem;'>{item}</div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown("<div style='color:#64748b; margin-top:10px; font-size:1.0rem;'>No special signage required for these dimensions.</div>", unsafe_allow_html=True)
+
                     st.markdown("</div>", unsafe_allow_html=True)
                     st.success("Result logged to Session Audit Log.")
             else:
