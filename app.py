@@ -3,6 +3,7 @@ import base64
 import datetime
 import time
 import pandas as pd
+import textwrap  # <--- Added for robust HTML formatting
 
 # --- 1. ENTERPRISE PAGE CONFIG ---
 st.set_page_config(
@@ -373,26 +374,31 @@ else:
                     time.sleep(0.5)
                     result = check_compliance(gcm, axles, width, height, length, is_night)
                     
-                    st.markdown(f"""
-</div>
-<div class="metric-card" style="background:white; color:#0f172a; border-left: 10px solid {result['color']}; margin-top:20px;">
-<div style="display:flex; justify-content:space-between; align-items:center;">
-<div>
-<h3 style="margin:0; color:#0f172a; font-size:1.8rem;">{result['icon']} {result['status']}</h3>
-<p style="margin:5px 0 0 0; font-weight:bold; color:#64748b; font-size:1.1rem;">{result['permit_type']}</p>
-</div>
-<div style="text-align:right;">
-<div style="font-size:0.9rem; color:#94a3b8;">ASSESSMENT ID</div>
-<div style="font-weight:bold; color:#0f172a;">#LP-{int(time.time())}</div>
-</div>
-</div>
-<div style="background-color:#fff1f2; border:1px solid #fda4af; padding:8px; border-radius:4px; margin-top:10px;">
-<p style="color:#be123c !important; font-size:0.9rem !important; margin:0; font-weight:bold;">
-⚠️ ESTIMATE ONLY: This is not a legal permit. You must lodge with NHVR.
-</p>
-</div>
-<hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
-""", unsafe_allow_html=True)
+                    # --- CRITICAL FIX: USING TEXTWRAP.DEDENT ---
+                    # This strips the indentation from the string before Streamlit sees it.
+                    # This PREVENTS the "Code Block" rendering issue completely.
+                    html_card = textwrap.dedent(f"""
+                        <div class="metric-card" style="background:white; color:#0f172a; border-left: 10px solid {result['color']}; margin-top:20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h3 style="margin:0; color:#0f172a; font-size:1.8rem;">{result['icon']} {result['status']}</h3>
+                                    <p style="margin:5px 0 0 0; font-weight:bold; color:#64748b; font-size:1.1rem;">{result['permit_type']}</p>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:0.9rem; color:#94a3b8;">ASSESSMENT ID</div>
+                                    <div style="font-weight:bold; color:#0f172a;">#LP-{int(time.time())}</div>
+                                </div>
+                            </div>
+                            
+                            <div style="background-color:#fff1f2; border:1px solid #fda4af; padding:8px; border-radius:4px; margin-top:10px;">
+                                <p style="color:#be123c !important; font-size:0.9rem !important; margin:0; font-weight:bold;">
+                                    ⚠️ ESTIMATE ONLY: This is not a legal permit. You must lodge with NHVR.
+                                </p>
+                            </div>
+
+                            <hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
+                    """)
+                    st.markdown(html_card, unsafe_allow_html=True)
                     
                     if result['issues']:
                         st.markdown("**⛔ Compliance Breaches:**")
@@ -415,7 +421,10 @@ else:
                             color = "#b91c1c" if "Pilot" in item else "#166534"
                             st.markdown(f"<div style='color:{color}; margin-bottom:5px; font-weight:bold; font-size:1.1rem;'>{item}</div>", unsafe_allow_html=True)
 
+                    # --- CLOSE THE WHITE CARD HERE ---
+                    # This ensures all the text above stays inside the white box.
                     st.markdown("</div>", unsafe_allow_html=True)
+                    
                     st.success("Result logged to Session Audit Log.")
             else:
                 st.markdown('</div>', unsafe_allow_html=True)
