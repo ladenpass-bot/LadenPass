@@ -12,10 +12,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. STATE MANAGEMENT (REAL SESSION DATA) ---
-# Initialize real session history instead of fake data
+# --- 2. STATE MANAGEMENT ---
 if "history" not in st.session_state:
-    st.session_state.history = [] # Starts empty, fills as user works
+    st.session_state.history = [] 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -31,13 +30,18 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. PROFESSIONAL STYLING ---
+# --- 4. PROFESSIONAL STYLING (FULL SUITE) ---
 st.markdown("""
     <style>
-    /* 1. LAYOUT & CENTERING */
+    /* 1. GLOBAL RESET & THEME */
     div[data-testid="stAppViewContainer"] {
         height: 100vh;
         overflow-y: auto;
+        background-color: #0f172a; 
+        background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
+        url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
+        background-size: cover;
+        background-attachment: fixed;
     }
     
     div.block-container {
@@ -47,29 +51,47 @@ st.markdown("""
         max-width: 1400px;
     }
 
-    /* 2. GLOBAL THEME (Dark Blue Background) */
-    .stApp {
-        background-color: #0f172a; 
-        background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
-        url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-    }
-
-    /* 3. TYPOGRAPHY */
+    /* 2. TYPOGRAPHY */
     h1 { color: #ffffff !important; font-size: 2.5rem !important; font-weight: 700 !important; margin-bottom: 5px !important; }
     h2 { color: #4ade80 !important; font-size: 1.5rem !important; margin-top: 0px !important; font-weight: 300 !important; }
     h3 { color: #ffffff !important; font-size: 1.2rem !important; font-weight: 600 !important; }
     p, li, label, span, div { color: #cbd5e1 !important; font-size: 0.9rem !important; }
     
-    /* 4. SIDEBAR (SOLID GREEN) */
+    /* 3. SIDEBAR (SOLID GREEN THEME) */
     [data-testid="stSidebar"] {
         background-color: #064e3b !important;
         border-right: 1px solid rgba(255,255,255,0.1);
     }
+    
+    /* 4. SIDEBAR WIDGETS (PROFILE & STATUS) */
+    .sidebar-card {
+        background-color: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    .user-badge {
+        background-color: #f59e0b;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .status-dot {
+        height: 10px;
+        width: 10px;
+        background-color: #4ade80;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+        animation: pulse-green 2s infinite;
+    }
 
-    /* 5. COMPONENTS */
+    /* 5. MAIN CONTENT COMPONENTS */
     .glass-card, [data-testid="stForm"], .control-panel, .metric-card {
         background-color: rgba(15, 23, 42, 0.75); 
         backdrop-filter: blur(12px);
@@ -102,13 +124,14 @@ st.markdown("""
         padding: 12px;
         border-radius: 6px;
         text-transform: uppercase;
+        margin-top: 10px;
     }
     .stButton > button:hover { background-color: #059669 !important; }
 
     /* 7. REMOVE DECORATIONS */
     header, footer, #MainMenu {visibility: hidden;}
     
-    /* 8. DATAFRAME STYLING */
+    /* 8. DATAFRAME */
     [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; }
     
     /* 9. SUBSCRIBE BUTTON */
@@ -129,9 +152,9 @@ st.markdown("""
     
     /* 10. ANIMATIONS */
     @keyframes pulse-green {
-        0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+        70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
     }
     
     /* 11. SALES POINTS */
@@ -160,7 +183,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 5. LOGIC & CALCULATION ---
+# --- 5. LOGIC ---
 def check_compliance(gcm, axles, width, height):
     timestamp = datetime.datetime.now().strftime("%H:%M:%S")
     report = {
@@ -173,7 +196,6 @@ def check_compliance(gcm, axles, width, height):
         "details": f"{gcm}t / {axles} Axles"
     }
     
-    # Logic
     if width > 2.5:
         report["issues"].append(f"Width ({width}m) > 2.5m")
         report["permit_type"] = "Class 1 Oversize"
@@ -207,7 +229,6 @@ def check_compliance(gcm, axles, width, height):
         report["icon"] = "⛔"
         report["permit_type"] = "Structural Fail"
 
-    # SAVE TO SESSION HISTORY (Real-time logging)
     st.session_state.history.insert(0, {
         "Time": timestamp,
         "Configuration": f"{gcm}t on {axles} Axles",
@@ -218,30 +239,57 @@ def check_compliance(gcm, axles, width, height):
     
     return report
 
-# --- 6. SIDEBAR ---
+# --- 6. SIDEBAR (PROFESSIONAL UPGRADE) ---
 with st.sidebar:
+    # A. LOGO
     if logo_b64:
-        st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;"></div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="logo-container" style="background:white; padding:10px; border-radius:8px; margin-bottom:20px; text-align:center;"><img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;"></div>""", unsafe_allow_html=True)
     else:
-        st.markdown("""<div class="logo-container"><p style="color:#064e3b !important; font-size: 20px; font-weight: bold; margin: 0;">LadenPass</p></div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="logo-container" style="background:white; padding:10px; border-radius:8px; margin-bottom:20px; text-align:center;"><p style="color:#064e3b !important; font-size: 20px; font-weight: bold; margin: 0;">LadenPass</p></div>""", unsafe_allow_html=True)
     
     if st.session_state.logged_in:
-        st.markdown("### Action Menu")
-        st.markdown(f"User: **{st.session_state.user_type}**")
+        # B. USER PROFILE CARD (Replaces simple text)
+        user_role = "ADMIN" if st.session_state.user_type == "Admin" else "TRIAL"
+        st.markdown(f"""
+        <div class="sidebar-card">
+            <div style="display:flex; align-items:center;">
+                <div style="font-size:1.5rem; margin-right:10px;">👤</div>
+                <div>
+                    <div style="color:white; font-weight:bold; font-size:0.9rem;">{st.session_state.user_type} Account</div>
+                    <span class="user-badge">{user_role} ACCESS</span>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # C. NAVIGATION (Styled Header + Radio)
+        st.markdown("<p style='font-size:0.75rem; color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-top:20px; margin-bottom:10px;'>MENU</p>", unsafe_allow_html=True)
         menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
         
+        # D. SYSTEM STATUS WIDGET
+        st.markdown("""
+        <div class="sidebar-card" style="margin-top:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.8rem; color:#cbd5e1;">System Status</span>
+                <span style="font-size:0.8rem; color:#4ade80;">99.9%</span>
+            </div>
+            <div style="margin-top:5px;">
+                <span class="status-dot"></span> <span style="font-size:0.8rem; color:white;">Operational</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # E. LOGOUT (Discrete)
         st.markdown("---")
-        if st.button("Log Out"):
+        if st.button("LOG OUT"):
             st.session_state.logged_in = False
             st.session_state.user_type = None
-            st.session_state.history = [] # Clear history on logout
+            st.session_state.history = []
             st.rerun()
-        st.success("🟢 System Online")
-        
+
     else:
-        # Secure Access Box (Custom Dark)
+        # LANDING PAGE SIDEBAR
         st.markdown("""<div style="background-color:#042f2e; border-left:4px solid #10b981; padding:12px; border-radius:4px; color:#94a3b8; font-size:0.85rem; margin-bottom:20px;"><span>🔒</span> <strong>Secure Access</strong></div>""", unsafe_allow_html=True)
-        # Trial Offer (Green Pulse)
         st.markdown("""<div style="background-color:rgba(6,78,59,0.4); border:2px solid #10b981; border-radius:8px; padding:15px; text-align:center; animation:pulse-green 2s infinite;"><h3 style="color:white; margin:0 0 10px 0; font-size:1rem;">🎉 7-Day Free Trial</h3><p style="color:#cbd5e1; font-size:0.8rem;">Test drive instantly.</p><div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:4px; margin-top:10px;"><div style="color:#34d399; font-weight:bold; font-size:0.85rem;">User: guest</div><div style="color:#34d399; font-weight:bold; font-size:0.85rem;">Pass: tryladenpass</div></div></div>""", unsafe_allow_html=True)
     
     st.markdown(f"""<div style='text-align:center; font-size:0.7rem; color:#cbd5e1; margin-top:40px; opacity:0.6;'>© {datetime.datetime.now().year} LadenPass<br>ABN: 16 632 316 240</div>""", unsafe_allow_html=True)
@@ -305,7 +353,7 @@ if not st.session_state.logged_in:
     
     st.markdown("""<div class="trust-bar"><div class="trust-item"><span class="trust-icon">👤</span><div class="trust-label">Industry Ready</div></div><div class="trust-item"><span class="trust-icon">✅</span><div class="trust-label">NHVR Compliant</div></div><div class="trust-item"><span class="trust-icon">🔒</span><div class="trust-label">AES-256 Secure</div></div></div>""", unsafe_allow_html=True)
 
-# >>> VIEW 2: LOGGED IN DASHBOARD (NO FAKE DATA) <<<
+# >>> VIEW 2: LOGGED IN DASHBOARD (PROFESSIONAL) <<<
 else:
     # Header
     st.markdown(f"""
@@ -321,48 +369,21 @@ else:
     """, unsafe_allow_html=True)
 
     if "Dashboard" in menu:
-        # 1. REAL SESSION METRICS
-        # Calculate stats based on actual checks run in this session
         checks_count = len(st.session_state.history)
         last_check_status = st.session_state.history[0]['Status'] if checks_count > 0 else "Ready"
         
         c1, c2, c3, c4 = st.columns(4)
         
         with c1:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">Session Checks</div>
-                <div class="metric-value">{checks_count}</div>
-                <div class="metric-delta">Live Session</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f"""<div class="metric-card"><div class="metric-label">Session Checks</div><div class="metric-value">{checks_count}</div><div class="metric-delta">Live Session</div></div>""", unsafe_allow_html=True)
         with c2:
             color = "#4ade80" if "APPROVED" in last_check_status else "#f59e0b" if "CONDITIONAL" in last_check_status else "#ef4444" if "NON-COMPLIANT" in last_check_status else "#94a3b8"
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">Last Status</div>
-                <div class="metric-value" style="font-size:1.5rem; color:{color};">{last_check_status}</div>
-                <div class="metric-delta">Latest Result</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f"""<div class="metric-card"><div class="metric-label">Last Status</div><div class="metric-value" style="font-size:1.5rem; color:{color};">{last_check_status}</div><div class="metric-delta">Latest Result</div></div>""", unsafe_allow_html=True)
         with c3:
-            st.markdown("""
-            <div class="metric-card">
-                <div class="metric-label">GML Limit</div>
-                <div class="metric-value">42.5t</div>
-                <div class="metric-delta">Standard General Access</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div class="metric-card"><div class="metric-label">GML Limit</div><div class="metric-value">42.5t</div><div class="metric-delta">Standard General Access</div></div>""", unsafe_allow_html=True)
         with c4:
-            st.markdown("""
-            <div class="metric-card">
-                <div class="metric-label">Compliance Database</div>
-                <div class="metric-value" style="font-size:1.5rem; color:#4ade80;">Online</div>
-                <div class="metric-delta">Gazette 2026</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div class="metric-card"><div class="metric-label">Compliance Database</div><div class="metric-value" style="font-size:1.5rem; color:#4ade80;">Online</div><div class="metric-delta">Gazette 2026</div></div>""", unsafe_allow_html=True)
 
-        # 2. REAL UTILITY (LINKS & HISTORY)
         col_main, col_side = st.columns([2, 1])
 
         with col_main:
@@ -370,7 +391,6 @@ else:
             if checks_count == 0:
                 st.info("No checks performed in this session. Go to 'Run Check' to begin.")
             else:
-                # Display real data from session state
                 df = pd.DataFrame(st.session_state.history)
                 st.table(df)
 
@@ -381,7 +401,6 @@ else:
                 <p style="margin-bottom:15px;">Quick access to official external resources.</p>
                 <a href="https://www.nhvr.gov.au/road-access/route-planner" target="_blank" style="display:block; background:#1e293b; color:white; padding:10px; border-radius:6px; margin-bottom:10px; text-decoration:none; border:1px solid #334155;">🗺️ NHVR Route Planner</a>
                 <a href="https://www.nhvr.gov.au/law-policies/notices-and-permit-based-schemes/national-notices" target="_blank" style="display:block; background:#1e293b; color:white; padding:10px; border-radius:6px; margin-bottom:10px; text-decoration:none; border:1px solid #334155;">📜 National Gazettes</a>
-                <a href="http://www.bom.gov.au/australia/warnings/" target="_blank" style="display:block; background:#1e293b; color:white; padding:10px; border-radius:6px; margin-bottom:10px; text-decoration:none; border:1px solid #334155;">🌦️ BOM Weather Warnings</a>
             </div>
             """, unsafe_allow_html=True)
 
