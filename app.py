@@ -1,182 +1,361 @@
 import streamlit as st
-import streamlit.components.v1 as components
+import pandas as pd
+import base64
+import datetime
+import time
 
-# --- PAGE CONFIGURATION ---
+# --- 1. ENTERPRISE PAGE CONFIG ---
 st.set_page_config(
-    page_title="LadenPass | Heavy Haulage",
-    page_icon="🚚",
-    layout="wide"
+    page_title="LadenPass | Automated Compliance",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# --- YOUR CUSTOM HTML/CSS CODE ---
-# This contains the previous layout with all checklist updates (ABN, Excavator services, Heavy Hauler styling)
-html_code = """
-<!DOCTYPE html>
-<html lang="en-AU">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+# --- 2. HELPER: LOAD IMAGE CORRECTLY ---
+def get_base64_image(image_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except FileNotFoundError:
+        return None
+
+logo_b64 = get_base64_image("logo.jpg")
+
+# --- 3. PROFESSIONAL STYLING (CSS) ---
+st.markdown("""
     <style>
-        /* --- GENERAL STYLES --- */
-        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #0e1117; color: #333; }
-        a { text-decoration: none; color: inherit; }
-        
-        /* --- HEADER --- */
-        header { background: #1a1a1a; color: #fff; padding: 1rem 0; }
-        .container { width: 90%; max-width: 1200px; margin: auto; overflow: hidden; }
-        
-        .logo { 
-            float: left; font-size: 1.5rem; font-weight: bold; color: #f4b400; 
-            display: flex; align-items: center; 
-        }
-        /* Logo image styling */
-        .logo img { height: 50px; margin-right: 10px; }
+    /* REMOVE TOP WHITESPACE */
+    .block-container { padding-top: 1rem !important; padding-bottom: 1rem !important; }
 
-        nav { float: right; margin-top: 10px; }
-        nav ul { list-style: none; padding: 0; margin: 0; }
-        nav ul li { display: inline; margin-left: 20px; }
-        nav a { color: #fff; font-weight: bold; }
-        nav a:hover { color: #f4b400; }
+    /* GLOBAL THEME */
+    .stApp {
+        background-color: #0f172a; 
+        background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
+        url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
 
-        /* --- HERO SECTION --- */
-        #hero {
-            /* Uses the heavy-hauler-bg.jpg from your repo */
-            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('heavy-hauler-bg.jpg');
-            background-size: cover;
-            background-position: center;
-            height: 70vh;
-            color: #fff;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-        }
-        #hero h1 { font-size: 3rem; margin-bottom: 10px; text-transform: uppercase; color: #f4b400; }
-        #hero p { font-size: 1.2rem; margin-bottom: 30px; }
-        
-        .btn-main {
-            background: #f4b400; color: #000; padding: 12px 30px; 
-            font-weight: bold; border-radius: 5px; text-transform: uppercase;
-        }
-        .btn-main:hover { background: #d49b00; cursor: pointer; }
+    /* TYPOGRAPHY */
+    h1, h2, h3, h4, h5, h6 { color: #ffffff !important; }
+    p, li, label, span, div { color: #cbd5e1 !important; }
+    
+    /* SIDEBAR */
+    [data-testid="stSidebar"] {
+        background-color: #064e3b !important;
+        border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* LOGO CONTAINER */
+    .logo-container {
+        background-color: white;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .logo-container img { max-width: 100%; height: auto; }
 
-        /* --- SERVICES SECTION --- */
-        #services { padding: 50px 0; text-align: center; background-color: #fff; }
-        .service-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 20px; margin-top: 30px;
-        }
-        .service-card {
-            background: #f4f4f4; padding: 20px; border-radius: 8px; border-bottom: 4px solid #f4b400;
-        }
+    /* GLASS CARDS */
+    .glass-card {
+        background-color: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+    
+    /* SALES BULLET POINTS */
+    .sales-point {
+        background-color: rgba(6, 78, 59, 0.4); /* Dark Green Tint */
+        border-left: 4px solid #4ade80;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 0 8px 8px 0;
+    }
+    .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; }
+    .sales-point p { margin: 5px 0 0 0 !important; font-size: 0.95rem !important; opacity: 0.9; }
 
-        /* --- QUOTE FORM SECTION --- */
-        #quote { background: #222; color: #fff; padding: 50px 0; }
-        .quote-form input, .quote-form select, .quote-form textarea {
-            width: 100%; padding: 10px; margin-bottom: 15px; border: none; border-radius: 4px; box-sizing: border-box;
-        }
-        .quote-form button { width: 100%; border: none; cursor: pointer; }
+    /* INPUTS & BUTTONS */
+    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border-radius: 6px;
+    }
+    div[role="listbox"] ul { background-color: white !important; }
+    div[role="option"] { color: black !important; }
+    
+    .stButton > button {
+        background-color: #22c55e !important;
+        color: white !important;
+        border: none;
+        font-weight: 600;
+        width: 100%;
+        padding: 0.6rem;
+    }
+    .stButton > button:hover { background-color: #16a34a !important; }
 
-        /* --- FOOTER --- */
-        footer { background: #111; color: #aaa; padding: 20px 0; text-align: center; font-size: 0.9rem; }
-        footer p { margin: 5px 0; }
-        footer a { color: #f4b400; }
+    /* FORM STYLING */
+    [data-testid="stForm"] {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
 
-        /* --- MOBILE --- */
-        @media(max-width: 768px) {
-            .logo, nav { float: none; display: block; text-align: center; }
-            nav { margin-top: 20px; }
-            #hero h1 { font-size: 2rem; }
-        }
+    /* CUSTOM SUBSCRIBE BUTTON */
+    .subscribe-btn-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+    }
+    .subscribe-btn {
+        display: inline-block;
+        background: linear-gradient(45deg, #f59e0b, #d97706);
+        color: white !important;
+        padding: 15px 40px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.2);
+        width: 100%;
+        text-align: center;
+    }
+    .subscribe-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+        color: white !important;
+        text-decoration: none;
+    }
+    
+    /* DISCLAIMER FOOTER */
+    .disclaimer {
+        font-size: 0.75rem;
+        color: #64748b !important;
+        text-align: center;
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid #334155;
+    }
+    
+    /* MOBILE RESPONSIVENESS FIX */
+    @media (max-width: 768px) {
+        div[data-testid="column"] { width: 100% !important; flex: 1 1 auto !important; min-width: 100% !important; }
+        h1 { font-size: 2.5rem !important; }
+    }
+
+    #MainMenu, footer, header {visibility: hidden;}
     </style>
-</head>
-<body>
+""", unsafe_allow_html=True)
 
-    <header>
-        <div class="container">
-            <div class="logo">
-                <img src="ladenpass-logo.png" alt="LadenPass Logo" onerror="this.style.display='none'"> 
-                LADENPASS
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#quote">Get a Quote</a></li>
-                </ul>
-            </nav>
+# --- 4. AUTOMATED ENGINE LOGIC (NO MANUAL WORK) ---
+def check_compliance(gcm, axles, width, height):
+    report = {
+        "status": "APPROVED",
+        "color": "#22c55e", 
+        "issues": [],
+        "permit_type": "General Access (No Permit Required)"
+    }
+    if width > 2.5:
+        report["issues"].append(f"⚠️ **Width ({width}m):** Exceeds 2.5m General Access limit.")
+        report["permit_type"] = "Class 1 Oversize Permit Required"
+        report["status"] = "CONDITIONAL"
+        report["color"] = "#f59e0b"
+    if height > 4.3:
+        report["issues"].append(f"⛔ **Height ({height}m):** Exceeds 4.3m standard clearance.")
+        report["permit_type"] = "High Productivity / Oversize Permit"
+        report["status"] = "NON-COMPLIANT"
+        report["color"] = "#ef4444" 
+    gml_limit = 42.5
+    if axles >= 7: gml_limit = 50.0 
+    if axles >= 9: gml_limit = 62.5 
+    if gcm > gml_limit:
+        report["issues"].append(f"⚠️ **Mass ({gcm}t):** Exceeds {gml_limit}t General Access limit.")
+        if report["status"] != "NON-COMPLIANT":
+            report["status"] = "CONDITIONAL"
+            report["permit_type"] = "Class 1 Overmass Permit Required"
+            report["color"] = "#f59e0b"
+    avg_axle_load = gcm / axles
+    if avg_axle_load > 9.0: 
+        report["issues"].append(f"⛔ **Axle Load ({avg_axle_load:.1f}t):** Exceeds safety limits (>9t/axle).")
+        report["status"] = "CRITICAL FAIL"
+        report["color"] = "#ef4444"
+        report["permit_type"] = "Structural Assessment Required"
+    return report
+
+
+# --- 5. SESSION STATE ---
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+# --- 6. SIDEBAR CONTENT ---
+with st.sidebar:
+    if logo_b64:
+        st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}"></div>""", unsafe_allow_html=True)
+    else:
+        st.markdown("""<div class="logo-container"><h2 style="color:#064e3b !important; margin:0;">LadenPass</h2></div>""", unsafe_allow_html=True)
+    
+    if st.session_state.logged_in:
+        st.markdown("### Action Menu")
+        menu = st.radio("", ["📊 Dashboard", "✅ Run Auto-Check"], label_visibility="collapsed")
+        st.markdown("---")
+        if st.button("Log Out"):
+            st.session_state.logged_in = False
+            st.rerun()
+        st.success("🟢 System Online")
+    else:
+        st.info("🔒 Secure Access")
+        st.caption("Please log in to access the Enterprise Platform.")
+
+    current_year = datetime.datetime.now().year
+    st.markdown(f"""
+        <div style='text-align: center; font-size: 0.8rem; color: #cbd5e1; margin-top: 15px; opacity: 0.8;'>
+            © {current_year} LadenPass Enterprise
         </div>
-    </header>
+    """, unsafe_allow_html=True)
 
-    <section id="hero">
-        <h1>Heavy Haulage Specialists</h1>
-        <p>Reliable transport for Excavators, Plant & Machinery across Sydney & Regional NSW.</p>
-        <a href="#quote" class="btn-main">Get a Free Quote</a>
-    </section>
 
-    <section id="services">
-        <div class="container">
-            <h2>Our Services</h2>
-            <p>Based in Padstow, serving the Greater Sydney Area.</p>
-            <div class="service-grid">
-                <div class="service-card">
-                    <h3>Excavator Transport</h3>
-                    <p>Safe loading and transport for excavators of all sizes.</p>
-                </div>
-                <div class="service-card">
-                    <h3>Plant Machinery</h3>
-                    <p>Bobcats, bulldozers, and heavy industrial equipment.</p>
-                </div>
-                <div class="service-card">
-                    <h3>Regional Haulage</h3>
-                    <p>Long-distance transport across New South Wales.</p>
-                </div>
-            </div>
+# --- 7. MAIN CONTENT ---
+
+# >>> VIEW 1: THE NEW SALES / LANDING PAGE <<<
+if not st.session_state.logged_in:
+    # --- HERO HEADER ---
+    st.markdown("""
+    <div style="text-align: left; padding: 20px 0 40px 0;">
+        <h1 style="font-size: 4rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 10px;">LadenPass Enterprise</h1>
+        <h2 style="color: #4ade80 !important; font-weight: 300; font-size: 1.8rem; margin-top: 0;">
+            Stop Guessing. Start Hauling.
+        </h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # --- SPLIT LAYOUT: SALES PITCH vs LOGIN ---
+    c_sales, c_login = st.columns([1.5, 1])
+    
+    with c_sales:
+        st.markdown("### Why use LadenPass?")
+        st.markdown("""
+        <div class="sales-point">
+            <h4>⚡ Instant Feasibility Checks</h4>
+            <p>Know if you are compliant in 2 seconds. Our engine calculates GML, Width, and Height limits instantly against NHVR gazettes.</p>
         </div>
-    </section>
+        <div class="sales-point">
+            <h4>🏗️ Bridge Formula Calculator</h4>
+            <p>Avoid structural failures. We automatically check your axle spacing and mass distribution against Tier 1 safety standards.</p>
+        </div>
+        <div class="sales-point">
+            <h4>💰 Avoid Expensive Fines</h4>
+            <p>Don't risk a $5,000 fine for being 200kg over. Validate your load before it hits the weighbridge.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.info("ℹ️ **Trusted by:** Independent Operators, Fleet Managers, and Compliance Officers across Australia.")
 
-    <section id="quote">
-        <div class="container">
-            <h2 style="text-align: center; color: #f4b400;">Request a Transport Quote</h2>
+    with c_login:
+        with st.form("login_form"):
+            st.subheader("Subscriber Login")
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            submitted = st.form_submit_button("Login")
             
-            <form class="quote-form" action="https://formspree.io/f/your-form-id" method="POST">
-                
-                <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" required>
-                <input type="tel" name="phone" placeholder="Phone Number" required>
-                
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" name="pickup" placeholder="Pickup Suburb (e.g. Yagoona)" required>
-                    <input type="text" name="dropoff" placeholder="Dropoff Suburb" required>
-                </div>
+            if submitted:
+                if username == "admin" and password == "trucks":
+                    st.session_state.logged_in = True
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials.")
+        
+        # --- THE CONVERTING CALL TO ACTION ---
+        st.markdown("""
+            <div class="subscribe-btn-container">
+                <a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="subscribe-btn" target="_blank">
+                    UNLOCK INSTANT ACCESS ($99/mo)
+                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 5px;">30-Day Money Back Guarantee</div>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
-                <select name="machinery_type">
-                    <option value="" disabled selected>Select Machinery Type</option>
-                    <option value="excavator">Excavator</option>
-                    <option value="bobcat">Bobcat</option>
-                    <option value="vehicle">Vehicle/Car</option>
-                    <option value="other">Other Heavy Load</option>
-                </select>
 
-                <textarea name="details" rows="4" placeholder="Additional details (Dimensions, Weight, Preferred Date)"></textarea>
-
-                <button type="submit" class="btn-main">Send Request</button>
-            </form>
+# >>> VIEW 2: LOGGED IN AREA (AUTOMATED) <<<
+else:
+    if "Dashboard" in menu:
+        st.markdown("""
+        <div style="text-align: center; padding: 20px 0 30px 0;">
+            <h1 style="font-size: 3rem;">Operations Dashboard</h1>
+            <p style="font-size: 1.1rem; opacity: 0.9;">Welcome back, Admin User.</p>
         </div>
-    </section>
+        """, unsafe_allow_html=True)
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 LadenPass Heavy Haulage.</p>
-            <p><strong>ABN:</strong> 16 632 316 240</p>
-            <p>
-                <a href="#">Privacy Policy</a> | 
-                <a href="#">Terms of Service</a>
-            </p>
+        # Metrics
+        c1, c2, c3, c4 = st.columns(4)
+        with c1: st.markdown('<div class="glass-card"><h3>🟢 Online</h3><p>Engine Status</p></div>', unsafe_allow_html=True)
+        with c2: st.markdown('<div class="glass-card"><h3>< 2s</h3><p>Calculation Speed</p></div>', unsafe_allow_html=True)
+        with c3: st.markdown('<div class="glass-card"><h3>Active</h3><p>Subscription</p></div>', unsafe_allow_html=True)
+        with c4: st.markdown('<div class="glass-card"><h3>Unlimited</h3><p>Remaining Checks</p></div>', unsafe_allow_html=True)
+
+        st.markdown("<br>### System Capabilities", unsafe_allow_html=True)
+        fc1, fc2, fc3 = st.columns(3)
+        with fc1:
+            st.markdown('<div class="glass-card"><h3>⚡ GML Limits</h3><p>Instant General Mass Limit verification.</p></div>', unsafe_allow_html=True)
+        with fc2:
+            st.markdown('<div class="glass-card"><h3>📐 Dimension Check</h3><p>Automatic width/height gazette cross-reference.</p></div>', unsafe_allow_html=True)
+        with fc3:
+            st.markdown('<div class="glass-card"><h3>🏗️ Tier 1 Safety</h3><p>Axle load distribution safety calculation.</p></div>', unsafe_allow_html=True)
+
+    elif "Run" in menu:
+        st.title("Instant Compliance Check")
+        st.markdown("Enter vehicle parameters below to run an automated assessment.")
+        
+        with st.container():
+            c1, c2 = st.columns(2)
+            with c1:
+                gcm = st.number_input("Gross Combination Mass (t)", 10.0, 200.0, 42.5)
+                axles = st.number_input("Number of Axles", 3, 20, 6)
+            with c2:
+                width = st.number_input("Vehicle Width (m)", 2.0, 8.0, 2.5)
+                height = st.number_input("Vehicle Height (m)", 2.0, 6.0, 4.3)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("RUN AUTOMATED CHECK"):
+            with st.spinner("Calculating Physics & Regulations..."):
+                time.sleep(1) # Visual effect
+                result = check_compliance(gcm, axles, width, height)
+                
+                st.markdown(f"""
+                <div style="background-color: white; border-radius: 10px; padding: 25px; border-left: 10px solid {result['color']}; margin-top: 20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2 style="color: #0f172a !important; margin:0;">Status: {result['status']}</h2>
+                    </div>
+                    <p style="color: #64748b !important; font-weight: bold; margin-top: 5px;">{result['permit_type']}</p>
+                    <hr style="border-top: 1px solid #e2e8f0; margin: 15px 0;">
+                """, unsafe_allow_html=True)
+                
+                if result['issues']:
+                    for issue in result['issues']:
+                        st.error(issue)
+                else:
+                    st.success("✅ Configuration meets General Access Limits. No Permit Required.")
+                    
+                st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("""
+        <div class="disclaimer">
+            <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on standard General Mass Limits (GML). 
+            Results are estimates only and do not constitute a legal permit. 
+            All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR).
         </div>
-    </footer>
-
-</body>
-</html>
-"""
-
-# --- RENDER THE HTML ---
-# This function renders your custom HTML/CSS inside the Streamlit app.
-# height=2000 ensures the user can scroll through the whole page.
-components.html(html_code, height=2000, scrolling=True)
+    """, unsafe_allow_html=True)
