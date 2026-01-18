@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="LadenPass | Automated Compliance",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded" 
+    initial_sidebar_state="expanded" # Tries to force it open
 )
 
 # --- 2. STATE MANAGEMENT ---
@@ -30,20 +30,25 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. PROFESSIONAL STYLING (FIXED SIDEBAR LOCK) ---
+# --- 4. PROFESSIONAL STYLING (FIXED SIDEBAR VISIBILITY) ---
 st.markdown("""
     <style>
-    /* 1. SIDEBAR LOCK - THE "SURGICAL STRIKE" */
-    /* This targets the specific collapse arrow button by its text description */
-    button[aria-label="Collapse sidebar"] {
+    /* 1. SIDEBAR VISIBILITY FIX */
+    /* Only hide the 'Collapse' button inside the sidebar (the X or < arrow) */
+    section[data-testid="stSidebar"] button[kind="header"] {
         display: none !important;
     }
-    /* Also hide the "Expand" button just in case */
+    
+    /* Ensure the 'Expand' button (>) in top-left is VISIBLE so you can open it if closed */
     [data-testid="collapsedControl"] {
-        display: none !important;
+        display: block !important; 
+        color: #4ade80 !important; /* Make the arrow green so you see it */
     }
-    /* Force sidebar width to stay fixed */
-    [data-testid="stSidebar"] {
+
+    /* Force the Sidebar to be Green */
+    section[data-testid="stSidebar"] {
+        background-color: #064e3b !important;
+        border-right: 1px solid rgba(255,255,255,0.1);
         min-width: 300px !important;
         max-width: 300px !important;
     }
@@ -72,13 +77,7 @@ st.markdown("""
     h3 { color: #ffffff !important; font-size: 1.2rem !important; font-weight: 600 !important; }
     p, li, label, span, div { color: #cbd5e1 !important; font-size: 0.9rem !important; }
     
-    /* 4. SIDEBAR (SOLID GREEN THEME) */
-    [data-testid="stSidebar"] {
-        background-color: #064e3b !important;
-        border-right: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    /* 5. SIDEBAR WIDGETS */
+    /* 4. SIDEBAR WIDGETS */
     .sidebar-card {
         background-color: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -106,7 +105,7 @@ st.markdown("""
         animation: pulse-green 2s infinite;
     }
 
-    /* 6. MAIN CONTENT COMPONENTS */
+    /* 5. MAIN CONTENT COMPONENTS */
     .glass-card, [data-testid="stForm"], .control-panel, .metric-card {
         background-color: rgba(15, 23, 42, 0.75); 
         backdrop-filter: blur(12px);
@@ -121,7 +120,7 @@ st.markdown("""
     .metric-value { font-size: 2rem; font-weight: 800; color: #ffffff; margin: 5px 0; }
     .metric-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
     
-    /* 7. INPUTS & BUTTONS */
+    /* 6. INPUTS & BUTTONS */
     .stTextInput input, .stNumberInput input {
         background-color: #1e293b !important;
         color: white !important;
@@ -143,13 +142,13 @@ st.markdown("""
     }
     .stButton > button:hover { background-color: #059669 !important; }
 
-    /* 8. REMOVE DECORATIONS */
+    /* 7. REMOVE DECORATIONS */
     header, footer, #MainMenu {visibility: hidden;}
     
-    /* 9. DATAFRAME */
+    /* 8. DATAFRAME */
     [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; }
     
-    /* 10. SUBSCRIBE BUTTON */
+    /* 9. SUBSCRIBE BUTTON */
     .subscribe-btn-container { display: flex; justify-content: center; margin-top: 20px; }
     .subscribe-btn {
         display: inline-block;
@@ -165,14 +164,14 @@ st.markdown("""
         text-align: center;
     }
     
-    /* 11. ANIMATIONS */
+    /* 10. ANIMATIONS */
     @keyframes pulse-green {
         0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
         70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
         100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
     }
     
-    /* 12. SALES POINTS */
+    /* 11. SALES POINTS */
     .sales-point {
         background-color: rgba(6, 78, 59, 0.6);
         border-left: 4px solid #4ade80;
@@ -182,7 +181,7 @@ st.markdown("""
     }
     .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; font-weight: bold !important; }
     
-    /* 13. TRUST BAR */
+    /* 12. TRUST BAR */
     .trust-bar {
         margin-top: 40px;
         display: flex;
@@ -254,7 +253,7 @@ def check_compliance(gcm, axles, width, height):
     
     return report
 
-# --- 6. SIDEBAR (LOCKED & PROFESSIONAL) ---
+# --- 6. SIDEBAR (PROFESSIONAL & LOCKED) ---
 with st.sidebar:
     # A. LOGO
     if logo_b64:
