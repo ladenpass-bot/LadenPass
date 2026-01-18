@@ -14,7 +14,7 @@ st.set_page_config(
 # --- 2. HELPER: LOAD IMAGE CORRECTLY ---
 def get_base64_image(image_path):
     try:
-        # Looks for 'logo.jpg' specifically
+        # Using logo.jpg as provided
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except FileNotFoundError:
@@ -22,13 +22,25 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 3. PROFESSIONAL STYLING (CSS) ---
+# --- 3. PROFESSIONAL STYLING (LOCKED LAYOUT) ---
 st.markdown("""
     <style>
-    /* REMOVE TOP WHITESPACE */
-    .block-container { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+    /* 1. FORCE FULL HEIGHT & VERTICAL CENTERING */
+    div[data-testid="stAppViewContainer"] {
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    div.block-container {
+        min-height: 90vh !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
 
-    /* GLOBAL THEME */
+    /* 2. GLOBAL THEME */
     .stApp {
         background-color: #0f172a; 
         background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
@@ -38,139 +50,132 @@ st.markdown("""
         background-attachment: fixed;
     }
 
-    /* TYPOGRAPHY */
-    h1, h2, h3, h4, h5, h6 { color: #ffffff !important; }
-    p, li, label, span, div { color: #cbd5e1 !important; }
+    /* 3. REMOVE DECORATIONS */
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    #MainMenu {visibility: hidden;}
+
+    /* 4. TYPOGRAPHY */
+    h1 { color: #ffffff !important; font-size: 3rem !important; font-weight: 700 !important; margin-bottom: 5px !important; }
+    h2 { color: #4ade80 !important; font-size: 1.5rem !important; margin-top: 0px !important; font-weight: 300 !important; }
+    h3 { color: #ffffff !important; font-size: 1.1rem !important; }
+    p, li, label, span, div { color: #cbd5e1 !important; font-size: 0.9rem !important; }
     
-    /* SIDEBAR */
+    /* 5. SIDEBAR (GREEN SECTION) */
     [data-testid="stSidebar"] {
         background-color: #064e3b !important;
         border-right: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* LOGO CONTAINER */
+    /* 6. LOGO CONTAINER */
     .logo-container {
         background-color: white;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
         text-align: center;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
-    /* GLASS CARDS */
+    /* 7. GLASS CARDS */
     .glass-card {
         background-color: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 25px;
+        padding: 20px;
         border-radius: 10px;
-        margin-bottom: 20px;
         height: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
-    /* SALES BULLET POINTS */
+    /* 8. SALES POINTS */
     .sales-point {
         background-color: rgba(6, 78, 59, 0.4);
         border-left: 4px solid #4ade80;
         padding: 15px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         border-radius: 0 8px 8px 0;
     }
-    .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; }
-    .sales-point p { margin: 5px 0 0 0 !important; font-size: 0.95rem !important; opacity: 0.9; }
+    .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; font-weight: bold !important; }
+    .sales-point p { margin: 2px 0 0 0 !important; font-size: 0.9rem !important; opacity: 0.9; }
 
-    /* INPUTS & BUTTONS */
-    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+    /* 9. FORM CONTAINER */
+    [data-testid="stForm"] {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* 10. INPUTS & BUTTONS */
+    .stTextInput input {
         background-color: #ffffff !important;
         color: #0f172a !important;
-        border-radius: 6px;
+        border-radius: 4px;
+        padding: 10px;
     }
-    div[role="listbox"] ul { background-color: white !important; }
-    div[role="option"] { color: black !important; }
-    
     .stButton > button {
         background-color: #22c55e !important;
         color: white !important;
         border: none;
         font-weight: 600;
         width: 100%;
-        padding: 0.6rem;
+        padding: 12px;
+        margin-top: 10px;
     }
     .stButton > button:hover { background-color: #16a34a !important; }
 
-    /* FORM STYLING */
-    [data-testid="stForm"] {
-        background-color: rgba(255, 255, 255, 0.05);
-        padding: 30px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-    }
-
-    /* SUBSCRIBE BUTTON */
+    /* 11. SUBSCRIBE BUTTON */
     .subscribe-btn-container {
         display: flex;
         justify-content: center;
-        margin-top: 15px;
+        margin-top: 20px;
     }
     .subscribe-btn {
         display: inline-block;
         background: linear-gradient(45deg, #f59e0b, #d97706);
         color: white !important;
-        padding: 15px 40px;
-        border-radius: 50px;
+        padding: 12px 40px;
+        border-radius: 30px;
         text-decoration: none;
         font-weight: bold;
-        font-size: 1.2rem;
-        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-        transition: all 0.3s ease;
+        font-size: 1.1rem;
         border: 1px solid rgba(255,255,255,0.2);
         width: 100%;
         text-align: center;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
     }
     .subscribe-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
         color: white !important;
-        text-decoration: none;
+        transform: translateY(-2px);
     }
     
-    /* TRUST BAR STYLING */
+    /* 12. TRUST BAR */
     .trust-bar {
-        background-color: rgba(255, 255, 255, 0.03);
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
         border-top: 1px solid rgba(255,255,255,0.1);
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding: 30px 20px;
-        margin-top: 50px;
-        border-radius: 15px;
-    }
-    .trust-item { text-align: center; margin: 10px; }
-    .trust-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
-    .trust-label { font-weight: bold; color: white !important; font-size: 1rem; }
-    .trust-sub { font-size: 0.8rem; color: #94a3b8 !important; }
-
-    /* DISCLAIMER FOOTER */
-    .disclaimer {
-        font-size: 0.75rem;
-        color: #64748b !important;
-        text-align: center;
-        margin-top: 50px;
         padding-top: 20px;
-        border-top: 1px solid #334155;
     }
-    .footer-links a { color: #f59e0b !important; margin: 0 10px; text-decoration: none; }
-    
-    /* MOBILE RESPONSIVENESS FIX */
-    @media (max-width: 768px) {
-        div[data-testid="column"] { width: 100% !important; flex: 1 1 auto !important; min-width: 100% !important; }
-        h1 { font-size: 2.5rem !important; }
-    }
+    .trust-item { text-align: center; opacity: 0.9; }
+    .trust-icon { font-size: 1.5rem; display: block; margin-bottom: 5px; }
+    .trust-label { font-weight: bold; color: white !important; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
 
-    #MainMenu, footer, header {visibility: hidden;}
+    /* 13. FOOTER */
+    .footer-container {
+        margin-top: 40px;
+        text-align: center;
+        opacity: 0.6;
+    }
+    .footer-text { font-size: 0.75rem; color: #64748b; }
+    .footer-links a { color: #f59e0b !important; margin: 0 10px; text-decoration: none; font-size: 0.75rem; }
+    
     </style>
 """, unsafe_allow_html=True)
 
@@ -183,13 +188,13 @@ def check_compliance(gcm, axles, width, height):
         "permit_type": "General Access (No Permit Required)"
     }
     if width > 2.5:
-        report["issues"].append(f"⚠️ **Width ({width}m):** Exceeds 2.5m General Access limit.")
-        report["permit_type"] = "Class 1 Oversize Permit Required"
+        report["issues"].append(f"⚠️ Width ({width}m) > 2.5m")
+        report["permit_type"] = "Class 1 Oversize Permit"
         report["status"] = "CONDITIONAL"
         report["color"] = "#f59e0b"
     if height > 4.3:
-        report["issues"].append(f"⛔ **Height ({height}m):** Exceeds 4.3m standard clearance.")
-        report["permit_type"] = "High Productivity / Oversize Permit"
+        report["issues"].append(f"⛔ Height ({height}m) > 4.3m")
+        report["permit_type"] = "High Productivity / Oversize"
         report["status"] = "NON-COMPLIANT"
         report["color"] = "#ef4444" 
     
@@ -198,59 +203,79 @@ def check_compliance(gcm, axles, width, height):
     if axles >= 9: gml_limit = 62.5 
     
     if gcm > gml_limit:
-        report["issues"].append(f"⚠️ **Mass ({gcm}t):** Exceeds {gml_limit}t General Access limit.")
+        report["issues"].append(f"⚠️ Mass ({gcm}t) > {gml_limit}t")
         if report["status"] != "NON-COMPLIANT":
             report["status"] = "CONDITIONAL"
-            report["permit_type"] = "Class 1 Overmass Permit Required"
+            report["permit_type"] = "Class 1 Overmass Permit"
             report["color"] = "#f59e0b"
             
     avg_axle_load = gcm / axles
     if avg_axle_load > 9.0: 
-        report["issues"].append(f"⛔ **Axle Load ({avg_axle_load:.1f}t):** Exceeds safety limits (>9t/axle).")
+        report["issues"].append(f"⛔ Axle Load ({avg_axle_load:.1f}t) > 9t")
         report["status"] = "CRITICAL FAIL"
         report["color"] = "#ef4444"
         report["permit_type"] = "Structural Assessment Required"
     return report
 
-
 # --- 5. SESSION STATE ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "user_type" not in st.session_state:
+    st.session_state.user_type = None
 
-# --- 6. SIDEBAR CONTENT ---
+# --- 6. SIDEBAR CONTENT (WITH SPECIAL OFFER) ---
 with st.sidebar:
+    # A. LOGO
     if logo_b64:
-        st.markdown(f"""
-            <div class="logo-container">
-                <img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;">
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;"></div>""", unsafe_allow_html=True)
     else:
-        st.markdown("""
-            <div class="logo-container">
-                <p style="color:#064e3b !important; font-size: 24px; font-weight: bold; margin: 0;">LadenPass</p>
-                <p style="color:#666 !important; font-size: 10px; margin: 0;">(Upload 'logo.jpg' to GitHub)</p>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("""<div class="logo-container"><p style="color:#064e3b !important; font-size: 20px; font-weight: bold; margin: 0;">LadenPass</p></div>""", unsafe_allow_html=True)
     
+    # B. LOGGED IN CONTROLS
     if st.session_state.logged_in:
         st.markdown("### Action Menu")
-        menu = st.radio("", ["📊 Dashboard", "✅ Run Auto-Check"], label_visibility="collapsed")
+        st.markdown(f"User: **{st.session_state.user_type}**")
+        menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
+        
         st.markdown("---")
         if st.button("Log Out"):
             st.session_state.logged_in = False
+            st.session_state.user_type = None
             st.rerun()
         st.success("🟢 System Online")
+        
     else:
         st.info("🔒 Secure Access")
-        st.caption("Please log in to access the Enterprise Platform.")
+        
+        # --- [NEW] ATTENTION GRABBING TRIAL OFFER ---
+        st.markdown("""
+        <div style="
+            background-color: #065f46; 
+            border: 2px solid #34d399; 
+            border-radius: 10px; 
+            padding: 15px; 
+            margin-top: 20px; 
+            text-align: center;
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.3);
+            animation: pulse 2s infinite;
+        ">
+            <h3 style="color: #ffffff; margin: 0 0 10px 0; font-size: 1.1rem;">🎉 7-Day Free Trial</h3>
+            <p style="color: #e2e8f0; font-size: 0.8rem; margin-bottom: 10px; line-height: 1.2;">
+                Test drive the platform instantly. No credit card required.
+            </p>
+            <div style="background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
+                <div style="color: #34d399; font-weight: bold; font-size: 0.9rem;">User: guest</div>
+                <div style="color: #34d399; font-weight: bold; font-size: 0.9rem;">Pass: tryladenpass</div>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.7rem; margin-top: 8px;">(Limited Time Only)</p>
+        </div>
+        """, unsafe_allow_html=True)
 
+    # D. SIDEBAR FOOTER
     current_year = datetime.datetime.now().year
-    
     st.markdown(f"""
-        <div style='text-align: center; font-size: 0.8rem; color: #cbd5e1; margin-top: 15px; opacity: 0.8;'>
-            © {current_year} LadenPass Enterprise<br>
-            <strong>ABN: 16 632 316 240</strong>
+        <div style='text-align: center; font-size: 0.7rem; color: #cbd5e1; margin-top: 30px; opacity: 0.6;'>
+            © {current_year} LadenPass<br>ABN: 16 632 316 240
         </div>
     """, unsafe_allow_html=True)
 
@@ -259,194 +284,151 @@ with st.sidebar:
 
 # >>> VIEW 1: LANDING PAGE <<<
 if not st.session_state.logged_in:
-    # HERO HEADER
+    
+    # 1. HEADER SECTION
     st.markdown("""
-    <div style="text-align: left; padding: 20px 0 40px 0;">
-        <h1 style="font-size: 4rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 10px;">LadenPass Enterprise</h1>
-        <h2 style="color: #4ade80 !important; font-weight: 300; font-size: 1.8rem; margin-top: 0;">
-            Heavy Haulage Compliance. Simplified.
-        </h2>
+    <div style="text-align: left; margin-bottom: 30px;">
+        <h1>LadenPass Enterprise</h1>
+        <h2>Heavy Haulage Compliance. Simplified.</h2>
     </div>
     """, unsafe_allow_html=True)
     
-    # SPLIT LAYOUT
-    c_sales, c_login = st.columns([1.5, 1])
+    # 2. SPLIT LAYOUT (SALES & LOGIN)
+    c_sales, c_login = st.columns([1.6, 1])
     
     with c_sales:
-        st.markdown("### Why use LadenPass?")
         st.markdown("""
         <div class="sales-point">
-            <h4>⚡ Instant Feasibility Checks</h4>
-            <p>Know if you are compliant in 2 seconds. Our engine calculates limits for <strong>Excavators, Bobcats, and Plant Machinery</strong>.</p>
+            <h4>⚡ Instant Feasibility</h4>
+            <p>Calculates limits for Excavators & Bobcats in seconds.</p>
         </div>
         <div class="sales-point">
-            <h4>🏗️ Bridge Formula Calculator</h4>
-            <p>Avoid structural failures. We check axle spacing and mass distribution against Tier 1 safety standards.</p>
+            <h4>🏗️ Bridge Formula Check</h4>
+            <p>Verify axle spacing against Tier 1 safety standards.</p>
         </div>
         <div class="sales-point">
-            <h4>💰 Avoid Expensive Fines</h4>
-            <p>Don't risk a $5,000 fine. Validate your load before it hits the weighbridge.</p>
+            <h4>💰 Avoid Fines</h4>
+            <p>Validate your load before it hits the weighbridge.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # TRUST ICONS
+        st.markdown("""
+        <div class="trust-bar">
+            <div class="trust-item">
+                <span class="trust-icon">👷‍♂️</span>
+                <div class="trust-label">Industry Ready</div>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon">✅</span>
+                <div class="trust-label">NHVR Compliant</div>
+            </div>
+             <div class="trust-item">
+                <span class="trust-icon">🔒</span>
+                <div class="trust-label">AES-256 Secure</div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
     with c_login:
         with st.form("login_form"):
-            st.subheader("Subscriber Login")
+            st.markdown("### Subscriber Login")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             submitted = st.form_submit_button("Login")
             
             if submitted:
-                # --- [SECURE LOGIN IMPLEMENTATION] ---
-                # This checks for secrets first to prevent crashes if they aren't set up
                 try:
-                    valid_user = st.secrets["credentials"]["username"]
-                    valid_pass = st.secrets["credentials"]["password"]
-                    
-                    if username == valid_user and password == valid_pass:
+                    admin_user = st.secrets["credentials"]["username"]
+                    admin_pass = st.secrets["credentials"]["password"]
+                    guest_user = st.secrets.get("guest", {}).get("username", "none")
+                    guest_pass = st.secrets.get("guest", {}).get("password", "none")
+
+                    if username == admin_user and password == admin_pass:
                         st.session_state.logged_in = True
+                        st.session_state.user_type = "Admin"
+                        st.rerun()
+                    elif username == guest_user and password == guest_pass:
+                        st.session_state.logged_in = True
+                        st.session_state.user_type = "Guest"
                         st.rerun()
                     else:
                         st.error("Invalid credentials.")
-                        
-                except Exception:
-                    st.error("⚠️ Security Config Missing. Please set up secrets.toml or Streamlit Secrets.")
-                    st.info("Instructions: Go to Settings > Secrets and add [credentials] block.")
+                except:
+                    st.error("⚠️ Secrets Error.")
 
         # SUBSCRIBE BUTTON
         st.markdown("""
             <div class="subscribe-btn-container">
                 <a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="subscribe-btn" target="_blank">
-                    UNLOCK INSTANT ACCESS ($99/mo)
-                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 5px;">30-Day Money Back Guarantee</div>
+                    UNLOCK INSTANT ACCESS ($99)
                 </a>
             </div>
         """, unsafe_allow_html=True)
 
-    # --- TRUST BAR ---
+    # 3. PROFESSIONAL FOOTER
     st.markdown("""
-    <div class="trust-bar">
-        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center;">
-            <div class="trust-item">
-                <span class="trust-icon">👷‍♂️</span>
-                <div class="trust-label">Industry Ready</div>
-                <div class="trust-sub">Civil, Mining & Agriculture</div>
+        <div class="footer-container">
+            <div class="footer-text">
+                Estimates only. Not a legal permit. Must be lodged with NHVR.
             </div>
-            <div class="trust-item">
-                <span class="trust-icon">✅</span>
-                <div class="trust-label">NHVR Compliance</div>
-                <div class="trust-sub">Updated to 2026 Gazettes</div>
-            </div>
-             <div class="trust-item">
-                <span class="trust-icon">🔒</span>
-                <div class="trust-label">Secure Data</div>
-                <div class="trust-sub">AES-256 Encryption</div>
-            </div>
-            <div class="trust-item">
-                <span class="trust-icon">🛡️</span>
-                <div class="trust-label">Safety First</div>
-                <div class="trust-sub">Chain of Responsibility</div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a> &bull; 
+                <a href="#">Terms of Service</a> &bull; 
+                <a href="#">Support</a>
             </div>
         </div>
-    </div>
     """, unsafe_allow_html=True)
 
 
 # >>> VIEW 2: LOGGED IN AREA (AUTOMATED) <<<
 else:
     if "Dashboard" in menu:
-        st.markdown("""
-        <div style="text-align: center; padding: 20px 0 30px 0;">
-            <h1 style="font-size: 3rem;">Operations Dashboard</h1>
-            <p style="font-size: 1.1rem; opacity: 0.9;">Welcome back, Admin User.</p>
+        st.markdown(f"""
+        <div style="text-align: center; padding-bottom: 20px;">
+            <h1>Operations Dashboard</h1>
+            <p>Welcome, {st.session_state.user_type}.</p>
         </div>
         """, unsafe_allow_html=True)
 
-        # Metrics
         c1, c2, c3, c4 = st.columns(4)
         with c1: st.markdown('<div class="glass-card"><h3>🟢 Online</h3><p>Engine Status</p></div>', unsafe_allow_html=True)
-        with c2: st.markdown('<div class="glass-card"><h3>< 2s</h3><p>Calculation Speed</p></div>', unsafe_allow_html=True)
-        with c3: st.markdown('<div class="glass-card"><h3>Active</h3><p>Subscription</p></div>', unsafe_allow_html=True)
-        with c4: st.markdown('<div class="glass-card"><h3>Unlimited</h3><p>Remaining Checks</p></div>', unsafe_allow_html=True)
-
-        st.markdown("<br>### System Capabilities", unsafe_allow_html=True)
+        with c2: st.markdown('<div class="glass-card"><h3>< 2s</h3><p>Speed</p></div>', unsafe_allow_html=True)
+        with c3: st.markdown('<div class="glass-card"><h3>Active</h3><p>Sub</p></div>', unsafe_allow_html=True)
+        with c4: st.markdown('<div class="glass-card"><h3>Unlimited</h3><p>Checks</p></div>', unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         fc1, fc2, fc3 = st.columns(3)
-        with fc1:
-            st.markdown('<div class="glass-card"><h3>⚡ GML Limits</h3><p>Instant General Mass Limit verification.</p></div>', unsafe_allow_html=True)
-        with fc2:
-            st.markdown('<div class="glass-card"><h3>📐 Dimension Check</h3><p>Automatic width/height gazette cross-reference.</p></div>', unsafe_allow_html=True)
-        with fc3:
-            st.markdown('<div class="glass-card"><h3>🏗️ Tier 1 Safety</h3><p>Axle load distribution safety calculation.</p></div>', unsafe_allow_html=True)
+        with fc1: st.markdown('<div class="glass-card"><h3>⚡ GML Limits</h3></div>', unsafe_allow_html=True)
+        with fc2: st.markdown('<div class="glass-card"><h3>📐 Dimensions</h3></div>', unsafe_allow_html=True)
+        with fc3: st.markdown('<div class="glass-card"><h3>🏗️ Tier 1 Safety</h3></div>', unsafe_allow_html=True)
 
     elif "Run" in menu:
-        st.title("Instant Compliance Check")
-        st.markdown("Enter vehicle parameters below to run an automated assessment.")
-        
+        st.markdown("## Instant Compliance Check")
         with st.container():
             c1, c2 = st.columns(2)
             with c1:
-                gcm = st.number_input("Gross Combination Mass (t)", 10.0, 200.0, 42.5)
-                axles = st.number_input("Number of Axles", 3, 20, 6)
+                gcm = st.number_input("GCM (t)", 10.0, 200.0, 42.5)
+                axles = st.number_input("Axles", 3, 20, 6)
             with c2:
-                width = st.number_input("Vehicle Width (m)", 2.0, 8.0, 2.5)
-                height = st.number_input("Vehicle Height (m)", 2.0, 6.0, 4.3)
+                width = st.number_input("Width (m)", 2.0, 8.0, 2.5)
+                height = st.number_input("Height (m)", 2.0, 6.0, 4.3)
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        if st.button("RUN AUTOMATED CHECK"):
-            with st.spinner("Calculating Physics & Regulations..."):
-                time.sleep(1) # Visual effect
+        if st.button("RUN CHECK"):
+            with st.spinner("Analyzing..."):
+                time.sleep(0.5)
                 result = check_compliance(gcm, axles, width, height)
                 
                 st.markdown(f"""
-                <div style="background-color: white; border-radius: 10px; padding: 25px; border-left: 10px solid {result['color']}; margin-top: 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h2 style="color: #0f172a !important; margin:0;">Status: {result['status']}</h2>
-                    </div>
-                    <p style="color: #64748b !important; font-weight: bold; margin-top: 5px;">{result['permit_type']}</p>
-                    <hr style="border-top: 1px solid #e2e8f0; margin: 15px 0;">
+                <div style="background-color: white; border-radius: 8px; padding: 15px; border-left: 8px solid {result['color']}; margin-top: 15px;">
+                    <h3 style="color: #0f172a !important; margin:0;">{result['status']}</h3>
+                    <p style="color: #64748b !important; font-weight: bold;">{result['permit_type']}</p>
+                    <hr style="border-top: 1px solid #e2e8f0; margin: 10px 0;">
                 """, unsafe_allow_html=True)
                 
                 if result['issues']:
                     for issue in result['issues']:
                         st.error(issue)
                 else:
-                    st.success("✅ Configuration meets General Access Limits. No Permit Required.")
-                    
+                    st.success("✅ Meets GML General Access.")
                 st.markdown("</div>", unsafe_allow_html=True)
-
-# --- FOOTER (NOW WITH LEGAL EXPANDERS) ---
-# [Step 2: Legal Implementation] - This section handles the legal text.
-st.markdown("<br><hr>", unsafe_allow_html=True)
-st.markdown("""
-    <div class="disclaimer">
-        <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on standard General Mass Limits (GML). 
-        Results are estimates only and do not constitute a legal permit. 
-        All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR).
-        <br><br>
-        <div style="margin-bottom: 20px;">
-            © 2026 LadenPass Heavy Haulage | <strong>ABN: 16 632 316 240</strong>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
-
-# Legal Expanders (Keeps text hidden until clicked)
-with st.expander("📜 Privacy Policy"):
-    st.write("""
-    **Privacy Policy for LadenPass**
-    
-    1. **Data Collection:** We collect user input (vehicle dimensions) and login credentials for functional purposes only.
-    2. **Usage:** Data is used to calculate compliance checks and is not sold to third parties.
-    3. **Storage:** No vehicle data is permanently stored in this version of the application.
-    4. **Contact:** For privacy concerns, contact the administrator.
-    """)
-
-with st.expander("⚖️ Terms of Service"):
-    st.write("""
-    **Terms of Service**
-    
-    1. **Not Legal Advice:** The outputs of this tool are for estimation only. 
-    2. **NHVR Authority:** Always consult the official NHVR portal before transport.
-    3. **Liability:** LadenPass is not liable for fines incurred based on these calculations.
-    4. **Refunds:** Subscription refunds are handled via Stripe's standard policies (30-day guarantee).
-    """)
