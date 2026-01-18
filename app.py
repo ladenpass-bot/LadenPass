@@ -373,28 +373,25 @@ else:
                     time.sleep(0.5)
                     result = check_compliance(gcm, axles, width, height, length, is_night)
                     
-                    # --- FIXED INDENTATION BELOW TO PREVENT RAW HTML DISPLAY ---
                     st.markdown(f"""
 </div>
 <div class="metric-card" style="background:white; color:#0f172a; border-left: 10px solid {result['color']}; margin-top:20px;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-            <h3 style="margin:0; color:#0f172a; font-size:1.8rem;">{result['icon']} {result['status']}</h3>
-            <p style="margin:5px 0 0 0; font-weight:bold; color:#64748b; font-size:1.1rem;">{result['permit_type']}</p>
-        </div>
-        <div style="text-align:right;">
-            <div style="font-size:0.9rem; color:#94a3b8;">ASSESSMENT ID</div>
-            <div style="font-weight:bold; color:#0f172a;">#LP-{int(time.time())}</div>
-        </div>
-    </div>
-    
-    <div style="background-color:#fff1f2; border:1px solid #fda4af; padding:8px; border-radius:4px; margin-top:10px;">
-        <p style="color:#be123c !important; font-size:0.9rem !important; margin:0; font-weight:bold;">
-            ⚠️ ESTIMATE ONLY: This is not a legal permit. You must lodge with NHVR.
-        </p>
-    </div>
-
-    <hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<div>
+<h3 style="margin:0; color:#0f172a; font-size:1.8rem;">{result['icon']} {result['status']}</h3>
+<p style="margin:5px 0 0 0; font-weight:bold; color:#64748b; font-size:1.1rem;">{result['permit_type']}</p>
+</div>
+<div style="text-align:right;">
+<div style="font-size:0.9rem; color:#94a3b8;">ASSESSMENT ID</div>
+<div style="font-weight:bold; color:#0f172a;">#LP-{int(time.time())}</div>
+</div>
+</div>
+<div style="background-color:#fff1f2; border:1px solid #fda4af; padding:8px; border-radius:4px; margin-top:10px;">
+<p style="color:#be123c !important; font-size:0.9rem !important; margin:0; font-weight:bold;">
+⚠️ ESTIMATE ONLY: This is not a legal permit. You must lodge with NHVR.
+</p>
+</div>
+<hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
 """, unsafe_allow_html=True)
                     
                     if result['issues']:
