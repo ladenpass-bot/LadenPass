@@ -251,6 +251,7 @@ with st.sidebar:
         
     else:
         # --- C. SECURE ACCESS (CUSTOM DARK BOX) ---
+        # Matches your screenshot instead of the blue st.info box
         st.markdown("""
         <div style="
             background-color: #042f2e; 
@@ -266,6 +267,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
         
         # --- D. 7-DAY TRIAL OFFER (IN SIDEBAR) ---
+        # Matches the Green Outline Box in your screenshot
         st.markdown("""
         <div style="
             background-color: rgba(6, 78, 59, 0.4); 
@@ -336,15 +338,11 @@ if not st.session_state.logged_in:
             submitted = st.form_submit_button("Login")
             
             if submitted:
-                # --- LOGIN LOGIC (UPDATED WITH FALLBACK) ---
                 try:
-                    # 1. Admin Logic (Secrets)
-                    admin_user = st.secrets.get("credentials", {}).get("username", "admin")
-                    admin_pass = st.secrets.get("credentials", {}).get("password", "trucks") # Fallback to 'trucks' if not set
-                    
-                    # 2. Guest Logic (Auto-Fallbacks enabled so it works instantly)
-                    guest_user = st.secrets.get("guest", {}).get("username", "guest")
-                    guest_pass = st.secrets.get("guest", {}).get("password", "tryladenpass")
+                    admin_user = st.secrets["credentials"]["username"]
+                    admin_pass = st.secrets["credentials"]["password"]
+                    guest_user = st.secrets.get("guest", {}).get("username", "none")
+                    guest_pass = st.secrets.get("guest", {}).get("password", "none")
 
                     if username == admin_user and password == admin_pass:
                         st.session_state.logged_in = True
@@ -356,14 +354,8 @@ if not st.session_state.logged_in:
                         st.rerun()
                     else:
                         st.error("Invalid credentials.")
-                except Exception as e:
-                    # Emergency bypass if secrets completely fail
-                    if username == "guest" and password == "tryladenpass":
-                         st.session_state.logged_in = True
-                         st.session_state.user_type = "Guest"
-                         st.rerun()
-                    else:
-                         st.error("Invalid credentials.")
+                except:
+                    st.error("⚠️ Secrets Error.")
         
         # TRIAL REQUEST LINK (TEXT ONLY)
         st.markdown("""
