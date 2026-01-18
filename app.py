@@ -22,10 +22,10 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 3. PROFESSIONAL STYLING (DARK BLUE THEME RESTORED) ---
+# --- 3. PROFESSIONAL STYLING (MATCHING SCREENSHOT PRECISELY) ---
 st.markdown("""
     <style>
-    /* 1. VERTICAL CENTERING LAYOUT */
+    /* 1. LAYOUT & CENTERING */
     div[data-testid="stAppViewContainer"] {
         height: 100vh;
         overflow-y: auto;
@@ -61,7 +61,7 @@ st.markdown("""
     h3 { color: #ffffff !important; font-size: 1.1rem !important; }
     p, li, label, span, div { color: #cbd5e1 !important; font-size: 0.9rem !important; }
     
-    /* 5. SIDEBAR (GREEN SECTION) */
+    /* 5. SIDEBAR (SOLID GREEN) */
     [data-testid="stSidebar"] {
         background-color: #064e3b !important;
         border-right: 1px solid rgba(255,255,255,0.1);
@@ -72,38 +72,38 @@ st.markdown("""
         background-color: white;
         padding: 10px;
         border-radius: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         text-align: center;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
-    /* 7. GLASS CARDS (DARKER / MORE SUBTLE - RESTORED) */
+    /* 7. GLASS CARDS (DARK THEME) */
     .glass-card {
-        background-color: rgba(255, 255, 255, 0.05); /* Low opacity for dark look */
+        background-color: rgba(15, 23, 42, 0.6); 
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 20px;
         border-radius: 10px;
         height: 100%;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
     
-    /* 8. SALES POINTS (DARK GREEN TINT - RESTORED) */
+    /* 8. SALES POINTS (DARK GREEN BARS) */
     .sales-point {
-        background-color: rgba(6, 78, 59, 0.4); /* Dark Green Tint */
+        background-color: rgba(6, 78, 59, 0.6);
         border-left: 4px solid #4ade80;
         padding: 15px;
         margin-bottom: 15px;
-        border-radius: 0 8px 8px 0;
+        border-radius: 4px;
     }
     .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; font-weight: bold !important; }
     .sales-point p { margin: 2px 0 0 0 !important; font-size: 0.9rem !important; opacity: 0.9; }
 
-    /* 9. FORM CONTAINER (DARK GLASS - RESTORED) */
+    /* 9. FORM CONTAINER (DARK) */
     [data-testid="stForm"] {
-        background-color: rgba(255, 255, 255, 0.05); /* Low opacity for dark look */
+        background-color: rgba(15, 23, 42, 0.6);
         padding: 30px;
         border-radius: 10px;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -119,17 +119,18 @@ st.markdown("""
         padding: 10px;
     }
     .stButton > button {
-        background-color: #22c55e !important;
-        color: white !important;
+        background-color: #f5f5f5 !important;
+        color: #0f172a !important;
         border: none;
         font-weight: 600;
-        width: 100%;
-        padding: 12px;
+        width: 100px;
+        padding: 8px;
         margin-top: 10px;
+        border-radius: 4px;
     }
-    .stButton > button:hover { background-color: #16a34a !important; }
+    .stButton > button:hover { background-color: #e2e8f0 !important; }
 
-    /* 11. SUBSCRIBE BUTTON */
+    /* 11. SUBSCRIBE BUTTON (ORANGE) */
     .subscribe-btn-container {
         display: flex;
         justify-content: center;
@@ -137,17 +138,17 @@ st.markdown("""
     }
     .subscribe-btn {
         display: inline-block;
-        background: linear-gradient(45deg, #f59e0b, #d97706);
+        background: linear-gradient(45deg, #f59e0b, #ea580c);
         color: white !important;
         padding: 12px 40px;
-        border-radius: 30px;
+        border-radius: 8px;
         text-decoration: none;
         font-weight: bold;
-        font-size: 1.1rem;
+        font-size: 1rem;
         border: 1px solid rgba(255,255,255,0.2);
         width: 100%;
         text-align: center;
-        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
     }
     .subscribe-btn:hover {
         color: white !important;
@@ -156,24 +157,25 @@ st.markdown("""
     
     /* 12. TRUST BAR */
     .trust-bar {
-        margin-top: 30px;
+        margin-top: 40px;
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         padding: 0 10px;
         border-top: 1px solid rgba(255,255,255,0.1);
         padding-top: 20px;
     }
-    .trust-item { text-align: center; opacity: 0.9; }
-    .trust-icon { font-size: 1.5rem; display: block; margin-bottom: 5px; }
-    .trust-label { font-weight: bold; color: white !important; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+    .trust-item { text-align: center; opacity: 1.0; }
+    .trust-icon { font-size: 1.2rem; display: block; margin-bottom: 5px; color: #f59e0b; }
+    .trust-label { font-weight: bold; color: white !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+    .trust-sub { font-size: 0.7rem; color: #94a3b8; }
 
     /* 13. FOOTER */
     .footer-container {
-        margin-top: 40px;
+        margin-top: 30px;
         text-align: center;
-        opacity: 0.6;
+        opacity: 0.7;
     }
-    .footer-text { font-size: 0.75rem; color: #64748b; }
+    .footer-text { font-size: 0.75rem; color: #64748b; margin-bottom: 5px; }
     .footer-links a { color: #f59e0b !important; margin: 0 10px; text-decoration: none; font-size: 0.75rem; }
     
     </style>
@@ -223,9 +225,9 @@ if "logged_in" not in st.session_state:
 if "user_type" not in st.session_state:
     st.session_state.user_type = None
 
-# --- 6. SIDEBAR CONTENT (WITH FUTURE ADDITIONS SLOT) ---
+# --- 6. SIDEBAR CONTENT ---
 with st.sidebar:
-    # A. LOGO
+    # A. LOGO (White Box)
     if logo_b64:
         st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;"></div>""", unsafe_allow_html=True)
     else:
@@ -237,8 +239,8 @@ with st.sidebar:
         st.markdown(f"User: **{st.session_state.user_type}**")
         menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
         
-        # >>> FUTURE ADDITIONS GO HERE <<<
-        # Example: st.button("⚙️ Settings")
+        # Future Additions Slot
+        # st.button("⚙️ Settings")
         
         st.markdown("---")
         if st.button("Log Out"):
@@ -248,36 +250,48 @@ with st.sidebar:
         st.success("🟢 System Online")
         
     else:
-        st.info("🔒 Secure Access")
-        
-        # --- 7-DAY TRIAL OFFER (IN SIDEBAR) ---
+        # --- C. SECURE ACCESS (CUSTOM DARK BOX) ---
+        # Matches your screenshot instead of the blue st.info box
         st.markdown("""
         <div style="
-            background-color: #065f46; 
-            border: 2px solid #34d399; 
-            border-radius: 10px; 
-            padding: 15px; 
-            margin-top: 20px; 
-            text-align: center;
-            box-shadow: 0 0 15px rgba(52, 211, 153, 0.3);
-            animation: pulse 2s infinite;
+            background-color: #042f2e; 
+            border-left: 4px solid #10b981; 
+            padding: 12px; 
+            border-radius: 4px; 
+            color: #94a3b8; 
+            font-size: 0.85rem;
+            margin-bottom: 20px;
         ">
-            <h3 style="color: #ffffff; margin: 0 0 10px 0; font-size: 1.1rem;">🎉 7-Day Free Trial</h3>
-            <p style="color: #e2e8f0; font-size: 0.8rem; margin-bottom: 10px; line-height: 1.2;">
+            <span style="margin-right: 8px;">🔒</span> <strong>Secure Access</strong>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # --- D. 7-DAY TRIAL OFFER (IN SIDEBAR) ---
+        # Matches the Green Outline Box in your screenshot
+        st.markdown("""
+        <div style="
+            background-color: rgba(6, 78, 59, 0.4); 
+            border: 2px solid #10b981; 
+            border-radius: 8px; 
+            padding: 15px; 
+            text-align: center;
+        ">
+            <h3 style="color: #ffffff; margin: 0 0 10px 0; font-size: 1.0rem;">🎉 7-Day Free Trial</h3>
+            <p style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 12px; line-height: 1.3;">
                 Test drive the platform instantly. No credit card required.
             </p>
-            <div style="background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
-                <div style="color: #34d399; font-weight: bold; font-size: 0.9rem;">User: guest</div>
-                <div style="color: #34d399; font-weight: bold; font-size: 0.9rem;">Pass: tryladenpass</div>
+            <div style="background-color: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                <div style="color: #34d399; font-weight: bold; font-size: 0.85rem;">User: guest</div>
+                <div style="color: #34d399; font-weight: bold; font-size: 0.85rem;">Pass: tryladenpass</div>
             </div>
-            <p style="color: #94a3b8; font-size: 0.7rem; margin-top: 8px;">(Limited Time Only)</p>
+            <p style="color: #94a3b8; font-size: 0.7rem; margin: 0;">(Limited Time Only)</p>
         </div>
         """, unsafe_allow_html=True)
 
-    # D. SIDEBAR FOOTER
+    # E. SIDEBAR FOOTER
     current_year = datetime.datetime.now().year
     st.markdown(f"""
-        <div style='text-align: center; font-size: 0.7rem; color: #cbd5e1; margin-top: 30px; opacity: 0.6;'>
+        <div style='text-align: center; font-size: 0.7rem; color: #cbd5e1; margin-top: 40px; opacity: 0.6;'>
             © {current_year} LadenPass<br>ABN: 16 632 316 240
         </div>
     """, unsafe_allow_html=True)
@@ -300,6 +314,7 @@ if not st.session_state.logged_in:
     c_sales, c_login = st.columns([1.6, 1])
     
     with c_sales:
+        st.markdown("### Why use LadenPass?")
         st.markdown("""
         <div class="sales-point">
             <h4>⚡ Instant Feasibility</h4>
@@ -312,24 +327,6 @@ if not st.session_state.logged_in:
         <div class="sales-point">
             <h4>💰 Avoid Fines</h4>
             <p>Validate your load before it hits the weighbridge.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # TRUST ICONS
-        st.markdown("""
-        <div class="trust-bar">
-            <div class="trust-item">
-                <span class="trust-icon">👷‍♂️</span>
-                <div class="trust-label">Industry Ready</div>
-            </div>
-            <div class="trust-item">
-                <span class="trust-icon">✅</span>
-                <div class="trust-label">NHVR Compliant</div>
-            </div>
-             <div class="trust-item">
-                <span class="trust-icon">🔒</span>
-                <div class="trust-label">AES-256 Secure</div>
-            </div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -359,6 +356,16 @@ if not st.session_state.logged_in:
                         st.error("Invalid credentials.")
                 except:
                     st.error("⚠️ Secrets Error.")
+        
+        # TRIAL REQUEST LINK (TEXT ONLY)
+        st.markdown("""
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="mailto:support@ladenpass.com.au?subject=Request Trial&body=Hi, request for trial code." 
+                   style="color: #4ade80; text-decoration: none; font-size: 0.85rem;">
+                   📩 Request Free Trial Code
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
         # SUBSCRIBE BUTTON
         st.markdown("""
@@ -369,7 +376,33 @@ if not st.session_state.logged_in:
             </div>
         """, unsafe_allow_html=True)
 
-    # 3. PROFESSIONAL FOOTER
+    # 3. TRUST BAR
+    st.markdown("""
+        <div class="trust-bar">
+            <div class="trust-item">
+                <span class="trust-icon">👤</span>
+                <div class="trust-label">Industry Ready</div>
+                <div class="trust-sub">Civil, Mining & Agriculture</div>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon">✅</span>
+                <div class="trust-label">NHVR Compliant</div>
+                <div class="trust-sub">Updated to 2026 Gazettes</div>
+            </div>
+             <div class="trust-item">
+                <span class="trust-icon">🔒</span>
+                <div class="trust-label">AES-256 Secure</div>
+                <div class="trust-sub">Secure Data</div>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon">🛡️</span>
+                <div class="trust-label">Safety First</div>
+                <div class="trust-sub">Chain of Responsibility</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # 4. FOOTER
     st.markdown("""
         <div class="footer-container">
             <div class="footer-text">
