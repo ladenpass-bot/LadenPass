@@ -30,7 +30,7 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. PROFESSIONAL STYLING (ENHANCED TYPOGRAPHY) ---
+# --- 4. PROFESSIONAL STYLING (ENHANCED TYPOGRAPHY & EDITED BACKGROUND) ---
 st.markdown("""
     <style>
     /* 1. SIDEBAR LOCK */
@@ -43,8 +43,9 @@ st.markdown("""
         height: 100vh;
         overflow-y: auto;
         background-color: #0f172a; 
+        /* Updated background image with Scania badge removed */
         background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
-        url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
+        url("https://images.unsplash.com/photo-1594321344595-5b7680144349?q=80&w=2670&auto=format&fit=crop"); 
         background-size: cover;
         background-attachment: fixed;
     }
