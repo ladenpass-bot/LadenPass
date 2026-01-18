@@ -30,7 +30,7 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. PROFESSIONAL STYLING (ENHANCED TYPOGRAPHY & EDITED BACKGROUND) ---
+# --- 4. PROFESSIONAL STYLING (RESTORED SCANIA BACKGROUND) ---
 st.markdown("""
     <style>
     /* 1. SIDEBAR LOCK */
@@ -43,9 +43,9 @@ st.markdown("""
         height: 100vh;
         overflow-y: auto;
         background-color: #0f172a; 
-        /* Updated background image with Scania badge removed */
+        /* Restored Scania Truck Background */
         background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
-        url("https://images.unsplash.com/photo-1594321344595-5b7680144349?q=80&w=2670&auto=format&fit=crop"); 
+        url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2670&auto=format&fit=crop");
         background-size: cover;
         background-attachment: fixed;
     }
@@ -57,41 +57,39 @@ st.markdown("""
         max-width: 1400px;
     }
 
-    /* 3. ENHANCED TYPOGRAPHY (BIGGER & CLEARER) */
+    /* 3. ENHANCED TYPOGRAPHY */
     h1 { 
         color: #ffffff !important; 
-        font-size: 3.5rem !important; /* Larger Main Title */
+        font-size: 3.5rem !important; 
         font-weight: 800 !important; 
         margin-bottom: 10px !important; 
         letter-spacing: -1px;
     }
     h2 { 
         color: #4ade80 !important; 
-        font-size: 2rem !important; /* Larger Subtitles */
+        font-size: 2rem !important; 
         margin-top: 0px !important; 
         font-weight: 400 !important; 
     }
     h3 { 
         color: #ffffff !important; 
-        font-size: 1.5rem !important; /* Larger Widget Headers */
+        font-size: 1.5rem !important; 
         font-weight: 600 !important; 
         margin-bottom: 10px !important;
     }
     p, li, label, div { 
         color: #cbd5e1 !important; 
-        font-size: 1.1rem !important; /* Base text increased from 0.9rem to 1.1rem */
-        line-height: 1.6 !important; /* Better spacing between lines */
+        font-size: 1.1rem !important; 
+        line-height: 1.6 !important;
     }
-    span {
-        font-size: inherit; /* Ensure spans inherit the larger size */
-    }
+    span { font-size: inherit; }
     
     /* 4. SIDEBAR WIDGETS */
     .sidebar-card {
         background-color: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
-        padding: 20px; /* More padding */
+        padding: 20px;
         margin-bottom: 20px;
     }
     .user-badge {
@@ -99,12 +97,12 @@ st.markdown("""
         color: white;
         padding: 4px 10px;
         border-radius: 4px;
-        font-size: 0.8rem; /* Larger Badge */
+        font-size: 0.8rem;
         font-weight: bold;
         text-transform: uppercase;
     }
     .status-dot {
-        height: 12px; /* Larger Dot */
+        height: 12px;
         width: 12px;
         background-color: #4ade80;
         border-radius: 50%;
@@ -119,7 +117,7 @@ st.markdown("""
         background-color: rgba(15, 23, 42, 0.75); 
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 30px; /* More breathing room */
+        padding: 30px;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         margin-bottom: 25px;
@@ -130,23 +128,23 @@ st.markdown("""
     .metric-label { font-size: 1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
     .metric-delta { font-size: 0.9rem; margin-top: 5px; }
     
-    /* 6. INPUTS & BUTTONS (LARGER TOUCH TARGETS) */
+    /* 6. INPUTS & BUTTONS */
     .stTextInput input, .stNumberInput input {
         background-color: #1e293b !important;
         color: white !important;
         border: 1px solid #334155;
         border-radius: 6px;
-        padding: 12px 15px; /* Larger click area */
-        font-size: 1.1rem !important; /* Larger input text */
+        padding: 12px 15px;
+        font-size: 1.1rem !important;
     }
     .stButton > button {
         background-color: #10b981 !important;
         color: white !important;
         border: none;
         font-weight: 700;
-        font-size: 1.1rem; /* Larger button text */
+        font-size: 1.1rem;
         width: 100%;
-        padding: 15px; /* Taller button */
+        padding: 15px;
         border-radius: 6px;
         text-transform: uppercase;
         margin-top: 10px;
@@ -169,7 +167,7 @@ st.markdown("""
         border-radius: 8px;
         text-decoration: none;
         font-weight: bold;
-        font-size: 1.2rem; /* Big readable button */
+        font-size: 1.2rem;
         border: 1px solid rgba(255,255,255,0.2);
         width: 100%;
         text-align: center;
