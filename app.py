@@ -249,14 +249,12 @@ with st.sidebar:
 
 # --- 7. MAIN CONTENT ---
 
-# >>> VIEW 1: LANDING PAGE (ADVERTISING NEW FEATURES) <<<
 if not st.session_state.logged_in:
     st.markdown("""<div style="text-align:left; margin-bottom:40px;"><h1>LadenPass Enterprise</h1><h2>Heavy Haulage Compliance. Simplified.</h2></div>""", unsafe_allow_html=True)
     
     c_sales, c_login = st.columns([1.6, 1])
     
     with c_sales:
-        # --- NEW ADVERTISING COPY ---
         st.markdown("""
         <div class="sales-point">
             <h4>👮 Automated Pilot & Escort Logic</h4>
@@ -302,13 +300,21 @@ if not st.session_state.logged_in:
                     else:
                         st.error("Invalid credentials.")
 
+        # RESTORED SUPPORT LINK
+        st.markdown("""
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="mailto:support@ladenpass.com.au?subject=Help with LadenPass" 
+                   style="color: #4ade80; text-decoration: none; font-size: 0.9rem;">
+                   📩 Need Help? Contact Support
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
+
         st.markdown("""<div class="subscribe-btn-container"><a href="https://buy.stripe.com/28EdRa2om1jWfAc5kZ9oc00" class="subscribe-btn">UNLOCK INSTANT ACCESS ($99)</a></div>""", unsafe_allow_html=True)
     
     st.markdown("""<div class="trust-bar"><div class="trust-item"><span class="trust-icon">👤</span><div class="trust-label">Industry Ready</div></div><div class="trust-item"><span class="trust-icon">✅</span><div class="trust-label">NHVR Compliant</div></div><div class="trust-item"><span class="trust-icon">🔒</span><div class="trust-label">AES-256 Secure</div></div></div>""", unsafe_allow_html=True)
 
-# >>> VIEW 2: LOGGED IN DASHBOARD <<<
 else:
-    # Header
     st.markdown(f"""
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div><h1>Operations Command</h1><p>Session Active: {st.session_state.user_type}</p></div>
@@ -381,6 +387,13 @@ else:
                                 <div style="font-weight:bold; color:#0f172a;">#LP-{int(time.time())}</div>
                             </div>
                         </div>
+                        
+                        <div style="background-color:#fff1f2; border:1px solid #fda4af; padding:8px; border-radius:4px; margin-top:10px;">
+                            <p style="color:#be123c !important; font-size:0.9rem !important; margin:0; font-weight:bold;">
+                                ⚠️ ESTIMATE ONLY: This is not a legal permit. You must lodge with NHVR.
+                            </p>
+                        </div>
+
                         <hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
                     """, unsafe_allow_html=True)
                     
