@@ -106,13 +106,7 @@ st.markdown("""
 # --- 5. AUTOMATION LOGIC ---
 
 def get_automated_requirements(width, length, is_night):
-    """
-    Automates Pilot Vehicle & Equipment Logic based on AU Standards.
-    """
-    reqs = {
-        "equipment": [],
-        "pilots": []
-    }
+    reqs = { "equipment": [], "pilots": [] }
     
     # 1. EQUIPMENT LOGIC
     if width > 2.5:
@@ -130,8 +124,7 @@ def get_automated_requirements(width, length, is_night):
     if is_night and width > 2.5:
         reqs["equipment"].append("💡 Side Marker Lights (Every 1.5m)")
 
-    # 2. PILOT VEHICLE LOGIC (The "Paid" Feature)
-    # Rules based on standard Class 1 Heavy Haulage notices
+    # 2. PILOT VEHICLE LOGIC
     if width > 4.5:
         reqs["pilots"].append("🚓 2x Pilot Vehicles (Front & Rear)")
     elif width > 3.5:
@@ -162,7 +155,6 @@ def check_compliance(gcm, axles, width, height, length, is_night):
         "pilots": auto_reqs["pilots"]
     }
     
-    # COMPLIANCE CHECKS
     if width > 2.5:
         report["issues"].append(f"Width ({width}m) > 2.5m")
         report["permit_type"] = "Class 1 Oversize"
@@ -257,15 +249,27 @@ with st.sidebar:
 
 # --- 7. MAIN CONTENT ---
 
+# >>> VIEW 1: LANDING PAGE (ADVERTISING NEW FEATURES) <<<
 if not st.session_state.logged_in:
     st.markdown("""<div style="text-align:left; margin-bottom:40px;"><h1>LadenPass Enterprise</h1><h2>Heavy Haulage Compliance. Simplified.</h2></div>""", unsafe_allow_html=True)
     
     c_sales, c_login = st.columns([1.6, 1])
+    
     with c_sales:
+        # --- NEW ADVERTISING COPY ---
         st.markdown("""
-        <div class="sales-point"><h4>⚡ Instant Feasibility</h4><p>Calculates limits for Excavators & Bobcats in seconds.</p></div>
-        <div class="sales-point"><h4>🏗️ Bridge Formula Check</h4><p>Verify axle spacing against Tier 1 safety standards.</p></div>
-        <div class="sales-point"><h4>💰 Avoid Fines</h4><p>Validate your load before it hits the weighbridge.</p></div>
+        <div class="sales-point">
+            <h4>👮 Automated Pilot & Escort Logic</h4>
+            <p>Stop guessing. Instantly calculate if you need 1 pilot, 2 pilots, or police escorts based on your exact dimensions.</p>
+        </div>
+        <div class="sales-point">
+            <h4>🚩 Smart Safety Equipment Lists</h4>
+            <p>Generates a precise checklist of required "Oversize" signs, flags, beacons, and side marker lights.</p>
+        </div>
+        <div class="sales-point">
+            <h4>⚡ Instant GML Feasibility</h4>
+            <p>Validate GCM, Axle Spacing, and Night Travel rules against 2026 National Gazettes in seconds.</p>
+        </div>
         """, unsafe_allow_html=True)
 
     with c_login:
@@ -302,6 +306,7 @@ if not st.session_state.logged_in:
     
     st.markdown("""<div class="trust-bar"><div class="trust-item"><span class="trust-icon">👤</span><div class="trust-label">Industry Ready</div></div><div class="trust-item"><span class="trust-icon">✅</span><div class="trust-label">NHVR Compliant</div></div><div class="trust-item"><span class="trust-icon">🔒</span><div class="trust-label">AES-256 Secure</div></div></div>""", unsafe_allow_html=True)
 
+# >>> VIEW 2: LOGGED IN DASHBOARD <<<
 else:
     # Header
     st.markdown(f"""
@@ -386,7 +391,6 @@ else:
                     else:
                         st.markdown(f"<div style='color:#166534; margin-top:5px; font-size:1.1rem;'>Configuration meets GML General Access Limits.</div>", unsafe_allow_html=True)
                     
-                    # NEW: PILOT VEHICLES SECTION
                     st.markdown("<br>", unsafe_allow_html=True)
                     c_equip, c_pilots = st.columns(2)
                     with c_equip:
