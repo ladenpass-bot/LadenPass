@@ -81,12 +81,12 @@ st.markdown("""
     .stButton > button { background-color: #10b981 !important; color: white !important; border: none; font-weight: 700; font-size: 1.1rem; width: 100%; padding: 15px; border-radius: 6px; text-transform: uppercase; margin-top: 10px; }
     .stButton > button:hover { background-color: #059669 !important; }
 
-    /* 7. CHECKBOX STYLING */
+    /* 7. CHECKBOX & DATAFRAME */
     [data-testid="stCheckbox"] label { font-size: 1.1rem !important; }
+    [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 1rem !important; }
 
     /* 8. MISC */
     header, footer, #MainMenu {visibility: hidden;}
-    [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 1rem !important; }
     .subscribe-btn-container { display: flex; justify-content: center; margin-top: 25px; }
     .subscribe-btn { display: inline-block; background: linear-gradient(45deg, #f59e0b, #ea580c); color: white !important; padding: 15px 50px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.2); width: 100%; text-align: center; }
     
@@ -103,37 +103,53 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 5. LOGIC & AUTOMATION ---
+# --- 5. AUTOMATION LOGIC ---
 
-def get_required_equipment(width, length, is_night):
+def get_automated_requirements(width, length, is_night):
     """
-    Automates the logic for required safety equipment based on NHVR standards.
+    Automates Pilot Vehicle & Equipment Logic based on AU Standards.
     """
-    equipment = []
+    reqs = {
+        "equipment": [],
+        "pilots": []
+    }
     
-    # 1. WIDTH LOGIC
+    # 1. EQUIPMENT LOGIC
     if width > 2.5:
-        equipment.append("⚠️ 'OVERSIZE' Sign (Front & Rear)")
-        equipment.append("🚩 4x Warning Flags (Brightly colored, corners)")
-        equipment.append("🔦 Low Beam Headlights (On during day)")
+        reqs["equipment"].append("⚠️ 'OVERSIZE' Sign (Front & Rear)")
+        reqs["equipment"].append("🚩 4x Warning Flags (Brightly colored)")
+        reqs["equipment"].append("🔦 Low Beam Headlights (Day Use)")
         
-    if width > 3.0:
-        equipment.append("🚨 1x Rotating Amber Beacon (Cab mounted)")
-        equipment.append("↔️ Delineators (Side markers)")
+    if width > 3.0 or length > 25.0:
+        reqs["equipment"].append("🚨 1x Rotating Amber Beacon (Cab)")
+        reqs["equipment"].append("↔️ Side Delineators")
 
-    # 2. LENGTH LOGIC
-    if length > 22.0: # Example length for Long Vehicle
-        equipment.append("🚛 'LONG VEHICLE' Sign (Rear)")
+    if length > 22.0:
+        reqs["equipment"].append("🚛 'LONG VEHICLE' Sign (Rear)")
 
-    # 3. NIGHT LOGIC
     if is_night and width > 2.5:
-        equipment.append("💡 Side Marker Lights (Yellow/Amber every 1.5m)")
-        equipment.append("🔦 Clearance Lights (Front/Rear edges)")
+        reqs["equipment"].append("💡 Side Marker Lights (Every 1.5m)")
 
-    return equipment
+    # 2. PILOT VEHICLE LOGIC (The "Paid" Feature)
+    # Rules based on standard Class 1 Heavy Haulage notices
+    if width > 4.5:
+        reqs["pilots"].append("🚓 2x Pilot Vehicles (Front & Rear)")
+    elif width > 3.5:
+        reqs["pilots"].append("🚗 1x Pilot Vehicle (Front)")
+    elif length > 30.0:
+        reqs["pilots"].append("🚗 1x Pilot Vehicle (Rear)")
+    elif is_night and width > 3.1:
+        reqs["pilots"].append("🚗 1x Pilot Vehicle (Front - Night Condition)")
+    
+    if not reqs["pilots"]:
+        reqs["pilots"].append("✅ No Pilot Vehicles Required")
+
+    return reqs
 
 def check_compliance(gcm, axles, width, height, length, is_night):
     timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+    auto_reqs = get_automated_requirements(width, length, is_night)
+    
     report = {
         "status": "APPROVED",
         "color": "#22c55e", 
@@ -141,11 +157,12 @@ def check_compliance(gcm, axles, width, height, length, is_night):
         "issues": [],
         "permit_type": "General Access",
         "timestamp": timestamp,
-        "details": f"{gcm}t / {axles} Axles",
-        "equipment": get_required_equipment(width, length, is_night) # Get automated equipment list
+        "details": f"{gcm}t | {width}m Wide",
+        "equipment": auto_reqs["equipment"],
+        "pilots": auto_reqs["pilots"]
     }
     
-    # COMPLIANCE LOGIC
+    # COMPLIANCE CHECKS
     if width > 2.5:
         report["issues"].append(f"Width ({width}m) > 2.5m")
         report["permit_type"] = "Class 1 Oversize"
@@ -240,26 +257,15 @@ with st.sidebar:
 
 # --- 7. MAIN CONTENT ---
 
-# >>> VIEW 1: LANDING PAGE <<<
 if not st.session_state.logged_in:
     st.markdown("""<div style="text-align:left; margin-bottom:40px;"><h1>LadenPass Enterprise</h1><h2>Heavy Haulage Compliance. Simplified.</h2></div>""", unsafe_allow_html=True)
     
     c_sales, c_login = st.columns([1.6, 1])
-    
     with c_sales:
         st.markdown("""
-        <div class="sales-point">
-            <h4>⚡ Instant Feasibility</h4>
-            <p>Calculates limits for Excavators & Bobcats in seconds.</p>
-        </div>
-        <div class="sales-point">
-            <h4>🏗️ Bridge Formula Check</h4>
-            <p>Verify axle spacing against Tier 1 safety standards.</p>
-        </div>
-        <div class="sales-point">
-            <h4>💰 Avoid Fines</h4>
-            <p>Validate your load before it hits the weighbridge.</p>
-        </div>
+        <div class="sales-point"><h4>⚡ Instant Feasibility</h4><p>Calculates limits for Excavators & Bobcats in seconds.</p></div>
+        <div class="sales-point"><h4>🏗️ Bridge Formula Check</h4><p>Verify axle spacing against Tier 1 safety standards.</p></div>
+        <div class="sales-point"><h4>💰 Avoid Fines</h4><p>Validate your load before it hits the weighbridge.</p></div>
         """, unsafe_allow_html=True)
 
     with c_login:
@@ -296,18 +302,12 @@ if not st.session_state.logged_in:
     
     st.markdown("""<div class="trust-bar"><div class="trust-item"><span class="trust-icon">👤</span><div class="trust-label">Industry Ready</div></div><div class="trust-item"><span class="trust-icon">✅</span><div class="trust-label">NHVR Compliant</div></div><div class="trust-item"><span class="trust-icon">🔒</span><div class="trust-label">AES-256 Secure</div></div></div>""", unsafe_allow_html=True)
 
-# >>> VIEW 2: LOGGED IN DASHBOARD <<<
 else:
     # Header
     st.markdown(f"""
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <div>
-            <h1>Operations Command</h1>
-            <p>Session Active: {st.session_state.user_type}</p>
-        </div>
-        <div style="text-align:right;">
-            <h3 style="color:#10b981 !important;">{datetime.date.today().strftime('%d %b %Y')}</h3>
-        </div>
+        <div><h1>Operations Command</h1><p>Session Active: {st.session_state.user_type}</p></div>
+        <div style="text-align:right;"><h3 style="color:#10b981 !important;">{datetime.date.today().strftime('%d %b %Y')}</h3></div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -316,27 +316,20 @@ else:
         last_check_status = st.session_state.history[0]['Status'] if checks_count > 0 else "Ready"
         
         c1, c2, c3, c4 = st.columns(4)
-        
-        with c1:
-            st.markdown(f"""<div class="metric-card"><div class="metric-label">Session Checks</div><div class="metric-value">{checks_count}</div><div class="metric-delta">Live Session</div></div>""", unsafe_allow_html=True)
+        with c1: st.markdown(f"""<div class="metric-card"><div class="metric-label">Session Checks</div><div class="metric-value">{checks_count}</div><div class="metric-delta">Live Session</div></div>""", unsafe_allow_html=True)
         with c2:
             color = "#4ade80" if "APPROVED" in last_check_status else "#f59e0b" if "CONDITIONAL" in last_check_status else "#ef4444" if "NON-COMPLIANT" in last_check_status else "#94a3b8"
             st.markdown(f"""<div class="metric-card"><div class="metric-label">Last Status</div><div class="metric-value" style="font-size:1.5rem; color:{color};">{last_check_status}</div><div class="metric-delta">Latest Result</div></div>""", unsafe_allow_html=True)
-        with c3:
-            st.markdown("""<div class="metric-card"><div class="metric-label">GML Limit</div><div class="metric-value">42.5t</div><div class="metric-delta">Standard General Access</div></div>""", unsafe_allow_html=True)
-        with c4:
-            st.markdown("""<div class="metric-card"><div class="metric-label">Compliance Database</div><div class="metric-value" style="font-size:1.5rem; color:#4ade80;">Online</div><div class="metric-delta">Gazette 2026</div></div>""", unsafe_allow_html=True)
+        with c3: st.markdown("""<div class="metric-card"><div class="metric-label">GML Limit</div><div class="metric-value">42.5t</div><div class="metric-delta">Standard General Access</div></div>""", unsafe_allow_html=True)
+        with c4: st.markdown("""<div class="metric-card"><div class="metric-label">Compliance Database</div><div class="metric-value" style="font-size:1.5rem; color:#4ade80;">Online</div><div class="metric-delta">Gazette 2026</div></div>""", unsafe_allow_html=True)
 
         col_main, col_side = st.columns([2, 1])
-
         with col_main:
             st.markdown("### 📋 Session Audit Log")
-            if checks_count == 0:
-                st.info("No checks performed in this session. Go to 'Run Check' to begin.")
+            if checks_count == 0: st.info("No checks performed in this session. Go to 'Run Check' to begin.")
             else:
                 df = pd.DataFrame(st.session_state.history)
                 st.table(df)
-
         with col_side:
             st.markdown("### 🛠️ Driver Toolkit")
             st.markdown("""
@@ -351,30 +344,20 @@ else:
         st.markdown("## 🚛 New Assessment")
         with st.container():
             st.markdown('<div class="control-panel">', unsafe_allow_html=True)
-            
-            # --- ROW 1: Weight & Axles ---
             c1, c2 = st.columns(2)
-            with c1:
-                gcm = st.number_input("GCM (t)", 10.0, 200.0, 42.5)
-            with c2:
-                axles = st.number_input("Axles", 3, 20, 6)
+            with c1: gcm = st.number_input("GCM (t)", 10.0, 200.0, 42.5)
+            with c2: axles = st.number_input("Axles", 3, 20, 6)
             
-            # --- ROW 2: Dimensions (Added Length for Signage Logic) ---
             st.markdown("<br>", unsafe_allow_html=True)
             c3, c4, c5 = st.columns(3)
-            with c3:
-                width = st.number_input("Width (m)", 2.0, 8.0, 2.5)
-            with c4:
-                height = st.number_input("Height (m)", 2.0, 6.0, 4.3)
-            with c5:
-                length = st.number_input("Length (m)", 12.0, 50.0, 19.0) # New field
-            
-            # --- ROW 3: Context ---
-            st.markdown("<br>", unsafe_allow_html=True)
-            is_night = st.checkbox("🌙 Night Travel? (Requires additional lighting)")
+            with c3: width = st.number_input("Width (m)", 2.0, 8.0, 2.5)
+            with c4: height = st.number_input("Height (m)", 2.0, 6.0, 4.3)
+            with c5: length = st.number_input("Length (m)", 12.0, 50.0, 19.0)
             
             st.markdown("<br>", unsafe_allow_html=True)
+            is_night = st.checkbox("🌙 Night Travel? (Adjusts Pilot Requirements)")
             
+            st.markdown("<br>", unsafe_allow_html=True)
             if st.button("RUN COMPLIANCE CHECK"):
                 with st.spinner("Analyzing Physics & Regulations..."):
                     time.sleep(0.5)
@@ -396,7 +379,6 @@ else:
                         <hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
                     """, unsafe_allow_html=True)
                     
-                    # 1. SHOW COMPLIANCE ISSUES
                     if result['issues']:
                         st.markdown("**⛔ Compliance Breaches:**")
                         for issue in result['issues']:
@@ -404,13 +386,20 @@ else:
                     else:
                         st.markdown(f"<div style='color:#166534; margin-top:5px; font-size:1.1rem;'>Configuration meets GML General Access Limits.</div>", unsafe_allow_html=True)
                     
-                    # 2. SHOW REQUIRED EQUIPMENT (NEW FEATURE)
-                    if result['equipment']:
-                        st.markdown("<br>**🛠️ Required Safety Gear (Automated):**", unsafe_allow_html=True)
-                        for item in result['equipment']:
-                            st.markdown(f"<div style='color:#0f172a; margin-bottom:5px; font-weight:500; font-size:1.1rem;'>{item}</div>", unsafe_allow_html=True)
-                    else:
-                        st.markdown("<div style='color:#64748b; margin-top:10px; font-size:1.0rem;'>No special signage required for these dimensions.</div>", unsafe_allow_html=True)
+                    # NEW: PILOT VEHICLES SECTION
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    c_equip, c_pilots = st.columns(2)
+                    with c_equip:
+                        st.markdown("**🛠️ Required Safety Gear:**")
+                        if result['equipment']:
+                            for item in result['equipment']: st.markdown(f"<div style='color:#0f172a; margin-bottom:5px; font-weight:500; font-size:1.1rem;'>{item}</div>", unsafe_allow_html=True)
+                        else: st.markdown("No special gear required.")
+                    
+                    with c_pilots:
+                        st.markdown("**👮 Required Pilot Vehicles:**")
+                        for item in result['pilots']:
+                            color = "#b91c1c" if "Pilot" in item else "#166534"
+                            st.markdown(f"<div style='color:{color}; margin-bottom:5px; font-weight:bold; font-size:1.1rem;'>{item}</div>", unsafe_allow_html=True)
 
                     st.markdown("</div>", unsafe_allow_html=True)
                     st.success("Result logged to Session Audit Log.")
