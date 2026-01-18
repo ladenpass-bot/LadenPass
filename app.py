@@ -14,12 +14,14 @@ st.set_page_config(
 # --- 2. HELPER: LOAD IMAGE CORRECTLY ---
 def get_base64_image(image_path):
     try:
+        # UPDATED: Now looks for 'logo.jpg' specifically
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except FileNotFoundError:
         return None
 
-logo_b64 = get_base64_image("ladenpass-logo.png")
+# Load the logo (Updated to match your file)
+logo_b64 = get_base64_image("logo.jpg")
 
 # --- 3. PROFESSIONAL STYLING (CSS) ---
 st.markdown("""
@@ -147,7 +149,7 @@ st.markdown("""
         margin-top: 50px;
         border-radius: 15px;
     }
-    .trust-item { text-align: center; }
+    .trust-item { text-align: center; margin: 10px; }
     .trust-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
     .trust-label { font-weight: bold; color: white !important; font-size: 1rem; }
     .trust-sub { font-size: 0.8rem; color: #94a3b8 !important; }
@@ -216,12 +218,23 @@ def check_compliance(gcm, axles, width, height):
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# --- 6. SIDEBAR CONTENT ---
+# --- 6. SIDEBAR CONTENT (UPDATED FOR LOGO.JPG) ---
 with st.sidebar:
     if logo_b64:
-        st.markdown(f"""<div class="logo-container"><img src="data:image/png;base64,{logo_b64}" style="max-width: 100%; height: auto;"></div>""", unsafe_allow_html=True)
+        # NOTE: Updated to 'image/jpeg' to match your file type
+        st.markdown(f"""
+            <div class="logo-container">
+                <img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;">
+            </div>
+        """, unsafe_allow_html=True)
     else:
-        st.markdown("""<div class="logo-container"><p style="color:#064e3b !important; font-size: 24px; font-weight: bold; margin: 0;">LadenPass</p><p style="color:#666 !important; font-size: 10px; margin: 0;">(Upload logo to fix)</p></div>""", unsafe_allow_html=True)
+        # Fallback if file is still missing
+        st.markdown("""
+            <div class="logo-container">
+                <p style="color:#064e3b !important; font-size: 24px; font-weight: bold; margin: 0;">LadenPass</p>
+                <p style="color:#666 !important; font-size: 10px; margin: 0;">(Upload 'logo.jpg' to GitHub)</p>
+            </div>
+        """, unsafe_allow_html=True)
     
     if st.session_state.logged_in:
         st.markdown("### Action Menu")
@@ -247,7 +260,7 @@ with st.sidebar:
 
 # --- 7. MAIN CONTENT ---
 
-# >>> VIEW 1: LANDING PAGE (TRUST SECTIONS, NO LOCAL) <<<
+# >>> VIEW 1: LANDING PAGE <<<
 if not st.session_state.logged_in:
     # HERO HEADER
     st.markdown("""
@@ -303,7 +316,7 @@ if not st.session_state.logged_in:
             </div>
         """, unsafe_allow_html=True)
 
-    # --- TRUST BAR (UPDATED: NO LOCAL PRESENCE) ---
+    # --- TRUST BAR (NO LOCAL PRESENCE) ---
     st.markdown("""
     <div class="trust-bar">
         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center;">
@@ -318,93 +331,3 @@ if not st.session_state.logged_in:
                 <div class="trust-sub">Updated to 2026 Gazettes</div>
             </div>
              <div class="trust-item">
-                <span class="trust-icon">🔒</span>
-                <div class="trust-label">Secure Data</div>
-                <div class="trust-sub">AES-256 Encryption</div>
-            </div>
-            <div class="trust-item">
-                <span class="trust-icon">🛡️</span>
-                <div class="trust-label">Safety First</div>
-                <div class="trust-sub">Chain of Responsibility</div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# >>> VIEW 2: LOGGED IN AREA (AUTOMATED) <<<
-else:
-    if "Dashboard" in menu:
-        st.markdown("""
-        <div style="text-align: center; padding: 20px 0 30px 0;">
-            <h1 style="font-size: 3rem;">Operations Dashboard</h1>
-            <p style="font-size: 1.1rem; opacity: 0.9;">Welcome back, Admin User.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Metrics
-        c1, c2, c3, c4 = st.columns(4)
-        with c1: st.markdown('<div class="glass-card"><h3>🟢 Online</h3><p>Engine Status</p></div>', unsafe_allow_html=True)
-        with c2: st.markdown('<div class="glass-card"><h3>< 2s</h3><p>Calculation Speed</p></div>', unsafe_allow_html=True)
-        with c3: st.markdown('<div class="glass-card"><h3>Active</h3><p>Subscription</p></div>', unsafe_allow_html=True)
-        with c4: st.markdown('<div class="glass-card"><h3>Unlimited</h3><p>Remaining Checks</p></div>', unsafe_allow_html=True)
-
-        st.markdown("<br>### System Capabilities", unsafe_allow_html=True)
-        fc1, fc2, fc3 = st.columns(3)
-        with fc1:
-            st.markdown('<div class="glass-card"><h3>⚡ GML Limits</h3><p>Instant General Mass Limit verification.</p></div>', unsafe_allow_html=True)
-        with fc2:
-            st.markdown('<div class="glass-card"><h3>📐 Dimension Check</h3><p>Automatic width/height gazette cross-reference.</p></div>', unsafe_allow_html=True)
-        with fc3:
-            st.markdown('<div class="glass-card"><h3>🏗️ Tier 1 Safety</h3><p>Axle load distribution safety calculation.</p></div>', unsafe_allow_html=True)
-
-    elif "Run" in menu:
-        st.title("Instant Compliance Check")
-        st.markdown("Enter vehicle parameters below to run an automated assessment.")
-        
-        with st.container():
-            c1, c2 = st.columns(2)
-            with c1:
-                gcm = st.number_input("Gross Combination Mass (t)", 10.0, 200.0, 42.5)
-                axles = st.number_input("Number of Axles", 3, 20, 6)
-            with c2:
-                width = st.number_input("Vehicle Width (m)", 2.0, 8.0, 2.5)
-                height = st.number_input("Vehicle Height (m)", 2.0, 6.0, 4.3)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        if st.button("RUN AUTOMATED CHECK"):
-            with st.spinner("Calculating Physics & Regulations..."):
-                time.sleep(1) # Visual effect
-                result = check_compliance(gcm, axles, width, height)
-                
-                st.markdown(f"""
-                <div style="background-color: white; border-radius: 10px; padding: 25px; border-left: 10px solid {result['color']}; margin-top: 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h2 style="color: #0f172a !important; margin:0;">Status: {result['status']}</h2>
-                    </div>
-                    <p style="color: #64748b !important; font-weight: bold; margin-top: 5px;">{result['permit_type']}</p>
-                    <hr style="border-top: 1px solid #e2e8f0; margin: 15px 0;">
-                """, unsafe_allow_html=True)
-                
-                if result['issues']:
-                    for issue in result['issues']:
-                        st.error(issue)
-                else:
-                    st.success("✅ Configuration meets General Access Limits. No Permit Required.")
-                    
-                st.markdown("</div>", unsafe_allow_html=True)
-
-    # DISCLAIMER & LINKS
-    st.markdown("""
-        <div class="disclaimer">
-            <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on standard General Mass Limits (GML). 
-            Results are estimates only and do not constitute a legal permit. 
-            All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR).
-            <br><br>
-            <div class="footer-links">
-                © 2026 LadenPass Heavy Haulage | <strong>ABN: 16 632 316 240</strong><br>
-                <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
