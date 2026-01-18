@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import base64
 import datetime
 import time
@@ -15,12 +14,14 @@ st.set_page_config(
 # --- 2. HELPER: LOAD IMAGE CORRECTLY ---
 def get_base64_image(image_path):
     try:
+        # Tries to open the image. If your file is named 'ladenpass-logo.png', ensure it matches here.
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except FileNotFoundError:
         return None
 
-logo_b64 = get_base64_image("logo.jpg")
+# UPDATED: Changed to 'ladenpass-logo.png' to match your previous files
+logo_b64 = get_base64_image("ladenpass-logo.png")
 
 # --- 3. PROFESSIONAL STYLING (CSS) ---
 st.markdown("""
@@ -149,6 +150,7 @@ st.markdown("""
         padding-top: 20px;
         border-top: 1px solid #334155;
     }
+    .footer-links a { color: #f59e0b !important; margin: 0 10px; text-decoration: none; }
     
     /* MOBILE RESPONSIVENESS FIX */
     @media (max-width: 768px) {
@@ -178,15 +180,18 @@ def check_compliance(gcm, axles, width, height):
         report["permit_type"] = "High Productivity / Oversize Permit"
         report["status"] = "NON-COMPLIANT"
         report["color"] = "#ef4444" 
+    
     gml_limit = 42.5
     if axles >= 7: gml_limit = 50.0 
     if axles >= 9: gml_limit = 62.5 
+    
     if gcm > gml_limit:
         report["issues"].append(f"⚠️ **Mass ({gcm}t):** Exceeds {gml_limit}t General Access limit.")
         if report["status"] != "NON-COMPLIANT":
             report["status"] = "CONDITIONAL"
             report["permit_type"] = "Class 1 Overmass Permit Required"
             report["color"] = "#f59e0b"
+            
     avg_axle_load = gcm / axles
     if avg_axle_load > 9.0: 
         report["issues"].append(f"⛔ **Axle Load ({avg_axle_load:.1f}t):** Exceeds safety limits (>9t/axle).")
@@ -220,9 +225,12 @@ with st.sidebar:
         st.caption("Please log in to access the Enterprise Platform.")
 
     current_year = datetime.datetime.now().year
+    
+    # UPDATED: Added ABN to sidebar footer
     st.markdown(f"""
         <div style='text-align: center; font-size: 0.8rem; color: #cbd5e1; margin-top: 15px; opacity: 0.8;'>
-            © {current_year} LadenPass Enterprise
+            © {current_year} LadenPass Enterprise<br>
+            <strong>ABN: 16 632 316 240</strong>
         </div>
     """, unsafe_allow_html=True)
 
@@ -236,7 +244,7 @@ if not st.session_state.logged_in:
     <div style="text-align: left; padding: 20px 0 40px 0;">
         <h1 style="font-size: 4rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 10px;">LadenPass Enterprise</h1>
         <h2 style="color: #4ade80 !important; font-weight: 300; font-size: 1.8rem; margin-top: 0;">
-            Stop Guessing. Start Hauling.
+            Heavy Haulage Compliance. Simplified.
         </h2>
     </div>
     """, unsafe_allow_html=True)
@@ -246,10 +254,12 @@ if not st.session_state.logged_in:
     
     with c_sales:
         st.markdown("### Why use LadenPass?")
+        
+        # UPDATED: Added specific machinery mentions (Excavators/Bobcats)
         st.markdown("""
         <div class="sales-point">
             <h4>⚡ Instant Feasibility Checks</h4>
-            <p>Know if you are compliant in 2 seconds. Our engine calculates GML, Width, and Height limits instantly against NHVR gazettes.</p>
+            <p>Know if you are compliant in 2 seconds. Our engine calculates limits for <strong>Excavators, Bobcats, and Plant Machinery</strong> instantly against NHVR gazettes.</p>
         </div>
         <div class="sales-point">
             <h4>🏗️ Bridge Formula Calculator</h4>
@@ -262,7 +272,8 @@ if not st.session_state.logged_in:
         """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
-        st.info("ℹ️ **Trusted by:** Independent Operators, Fleet Managers, and Compliance Officers across Australia.")
+        # UPDATED: Added specific location
+        st.info("ℹ️ **Trusted by:** Operators in Padstow, Sydney Metro, and Regional NSW.")
 
     with c_login:
         with st.form("login_form"):
@@ -352,10 +363,16 @@ else:
                     
                 st.markdown("</div>", unsafe_allow_html=True)
 
+    # UPDATED: Footer with ABN and Privacy Links
     st.markdown("""
         <div class="disclaimer">
             <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on standard General Mass Limits (GML). 
             Results are estimates only and do not constitute a legal permit. 
             All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR).
+            <br><br>
+            <div class="footer-links">
+                © 2026 LadenPass Heavy Haulage | <strong>ABN: 16 632 316 240</strong><br>
+                <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+            </div>
         </div>
     """, unsafe_allow_html=True)
