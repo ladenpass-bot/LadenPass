@@ -14,13 +14,11 @@ st.set_page_config(
 # --- 2. HELPER: LOAD IMAGE CORRECTLY ---
 def get_base64_image(image_path):
     try:
-        # Tries to open the image. Ensure 'ladenpass-logo.png' is in your GitHub repo.
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except FileNotFoundError:
         return None
 
-# Load the logo
 logo_b64 = get_base64_image("ladenpass-logo.png")
 
 # --- 3. PROFESSIONAL STYLING (CSS) ---
@@ -112,7 +110,7 @@ st.markdown("""
         backdrop-filter: blur(10px);
     }
 
-    /* CUSTOM SUBSCRIBE BUTTON */
+    /* SUBSCRIBE BUTTON */
     .subscribe-btn-container {
         display: flex;
         justify-content: center;
@@ -140,6 +138,20 @@ st.markdown("""
         text-decoration: none;
     }
     
+    /* TRUST BAR STYLING */
+    .trust-bar {
+        background-color: rgba(255, 255, 255, 0.03);
+        border-top: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 30px 20px;
+        margin-top: 50px;
+        border-radius: 15px;
+    }
+    .trust-item { text-align: center; }
+    .trust-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .trust-label { font-weight: bold; color: white !important; font-size: 1rem; }
+    .trust-sub { font-size: 0.8rem; color: #94a3b8 !important; }
+
     /* DISCLAIMER FOOTER */
     .disclaimer {
         font-size: 0.75rem;
@@ -204,23 +216,12 @@ def check_compliance(gcm, axles, width, height):
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# --- 6. SIDEBAR CONTENT (FIXED) ---
+# --- 6. SIDEBAR CONTENT ---
 with st.sidebar:
-    # UPDATED LOGIC FOR LOGO VISIBILITY
     if logo_b64:
-        st.markdown(f"""
-            <div class="logo-container">
-                <img src="data:image/png;base64,{logo_b64}" style="max-width: 100%; height: auto;">
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f"""<div class="logo-container"><img src="data:image/png;base64,{logo_b64}" style="max-width: 100%; height: auto;"></div>""", unsafe_allow_html=True)
     else:
-        # FALLBACK IF IMAGE IS MISSING (Green Text so it is visible on white background)
-        st.markdown("""
-            <div class="logo-container">
-                <p style="color:#064e3b !important; font-size: 24px; font-weight: bold; margin: 0;">LadenPass</p>
-                <p style="color:#666 !important; font-size: 10px; margin: 0;">(Upload logo to fix)</p>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("""<div class="logo-container"><p style="color:#064e3b !important; font-size: 24px; font-weight: bold; margin: 0;">LadenPass</p><p style="color:#666 !important; font-size: 10px; margin: 0;">(Upload logo to fix)</p></div>""", unsafe_allow_html=True)
     
     if st.session_state.logged_in:
         st.markdown("### Action Menu")
@@ -236,7 +237,6 @@ with st.sidebar:
 
     current_year = datetime.datetime.now().year
     
-    # FOOTER WITH ABN
     st.markdown(f"""
         <div style='text-align: center; font-size: 0.8rem; color: #cbd5e1; margin-top: 15px; opacity: 0.8;'>
             © {current_year} LadenPass Enterprise<br>
@@ -247,9 +247,9 @@ with st.sidebar:
 
 # --- 7. MAIN CONTENT ---
 
-# >>> VIEW 1: THE NEW SALES / LANDING PAGE <<<
+# >>> VIEW 1: LANDING PAGE (TRUST SECTIONS, NO LOCAL) <<<
 if not st.session_state.logged_in:
-    # --- HERO HEADER ---
+    # HERO HEADER
     st.markdown("""
     <div style="text-align: left; padding: 20px 0 40px 0;">
         <h1 style="font-size: 4rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 10px;">LadenPass Enterprise</h1>
@@ -259,30 +259,25 @@ if not st.session_state.logged_in:
     </div>
     """, unsafe_allow_html=True)
     
-    # --- SPLIT LAYOUT: SALES PITCH vs LOGIN ---
+    # SPLIT LAYOUT
     c_sales, c_login = st.columns([1.5, 1])
     
     with c_sales:
         st.markdown("### Why use LadenPass?")
-        
-        # SALES POINTS (Excavators, Bobcats, etc.)
         st.markdown("""
         <div class="sales-point">
             <h4>⚡ Instant Feasibility Checks</h4>
-            <p>Know if you are compliant in 2 seconds. Our engine calculates limits for <strong>Excavators, Bobcats, and Plant Machinery</strong> instantly against NHVR gazettes.</p>
+            <p>Know if you are compliant in 2 seconds. Our engine calculates limits for <strong>Excavators, Bobcats, and Plant Machinery</strong>.</p>
         </div>
         <div class="sales-point">
             <h4>🏗️ Bridge Formula Calculator</h4>
-            <p>Avoid structural failures. We automatically check your axle spacing and mass distribution against Tier 1 safety standards.</p>
+            <p>Avoid structural failures. We check axle spacing and mass distribution against Tier 1 safety standards.</p>
         </div>
         <div class="sales-point">
             <h4>💰 Avoid Expensive Fines</h4>
-            <p>Don't risk a $5,000 fine for being 200kg over. Validate your load before it hits the weighbridge.</p>
+            <p>Don't risk a $5,000 fine. Validate your load before it hits the weighbridge.</p>
         </div>
         """, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.info("ℹ️ **Trusted by:** Operators in Padstow, Sydney Metro, and Regional NSW.")
 
     with c_login:
         with st.form("login_form"):
@@ -307,6 +302,34 @@ if not st.session_state.logged_in:
                 </a>
             </div>
         """, unsafe_allow_html=True)
+
+    # --- TRUST BAR (UPDATED: NO LOCAL PRESENCE) ---
+    st.markdown("""
+    <div class="trust-bar">
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center;">
+            <div class="trust-item">
+                <span class="trust-icon">👷‍♂️</span>
+                <div class="trust-label">Industry Ready</div>
+                <div class="trust-sub">Civil, Mining & Agriculture</div>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon">✅</span>
+                <div class="trust-label">NHVR Compliance</div>
+                <div class="trust-sub">Updated to 2026 Gazettes</div>
+            </div>
+             <div class="trust-item">
+                <span class="trust-icon">🔒</span>
+                <div class="trust-label">Secure Data</div>
+                <div class="trust-sub">AES-256 Encryption</div>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon">🛡️</span>
+                <div class="trust-label">Safety First</div>
+                <div class="trust-sub">Chain of Responsibility</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # >>> VIEW 2: LOGGED IN AREA (AUTOMATED) <<<
