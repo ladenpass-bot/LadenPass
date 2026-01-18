@@ -22,10 +22,10 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 3. PROFESSIONAL STYLING (LOCKED LAYOUT) ---
+# --- 3. PROFESSIONAL STYLING (GLASS RESTORED) ---
 st.markdown("""
     <style>
-    /* 1. FORCE FULL HEIGHT & VERTICAL CENTERING */
+    /* 1. VERTICAL CENTERING LAYOUT */
     div[data-testid="stAppViewContainer"] {
         height: 100vh;
         overflow-y: auto;
@@ -81,7 +81,7 @@ st.markdown("""
 
     /* 7. GLASS CARDS */
     .glass-card {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(255, 255, 255, 0.08); /* Increased visibility */
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 20px;
@@ -90,20 +90,21 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
-    /* 8. SALES POINTS */
+    /* 8. SALES POINTS (LIGHTER GREEN TO POP ON DARK BG) */
     .sales-point {
-        background-color: rgba(6, 78, 59, 0.4);
+        background-color: rgba(6, 78, 59, 0.5); /* Slightly less transparent */
         border-left: 4px solid #4ade80;
         padding: 15px;
         margin-bottom: 15px;
         border-radius: 0 8px 8px 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
     .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; font-weight: bold !important; }
-    .sales-point p { margin: 2px 0 0 0 !important; font-size: 0.9rem !important; opacity: 0.9; }
+    .sales-point p { margin: 2px 0 0 0 !important; font-size: 0.9rem !important; opacity: 1.0 !important; }
 
-    /* 9. FORM CONTAINER */
+    /* 9. FORM CONTAINER (LIGHTER GLASS) */
     [data-testid="stForm"] {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(255, 255, 255, 0.08); /* Lighter glass effect */
         padding: 30px;
         border-radius: 10px;
         border: 1px solid rgba(255, 255, 255, 0.1);
