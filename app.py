@@ -1,147 +1,182 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
-# --- 1. PAGE CONFIGURATION ---
+# --- PAGE CONFIGURATION ---
 st.set_page_config(
     page_title="LadenPass | Heavy Haulage",
     page_icon="🚚",
     layout="wide"
 )
 
-# --- 2. CUSTOM CSS (Styling) ---
-# Enforces the Black & Safety Yellow (Heavy Hauler) theme
-st.markdown("""
+# --- YOUR CUSTOM HTML/CSS CODE ---
+# This contains the previous layout with all checklist updates (ABN, Excavator services, Heavy Hauler styling)
+html_code = """
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-    /* Main Background & Text */
-    .stApp {
-        background-color: #0e1117;
-        color: #ffffff;
-    }
-    
-    /* Headers (Safety Yellow) */
-    h1, h2, h3 {
-        color: #f4b400 !important;
-    }
-    
-    /* Buttons (Yellow with Black Text) */
-    div.stButton > button {
-        background-color: #f4b400;
-        color: black;
-        font-weight: bold;
-        width: 100%;
-        border-radius: 5px;
-        border: none;
-        padding: 10px;
-    }
-    div.stButton > button:hover {
-        background-color: #d49b00;
-        color: white;
-        border-color: #d49b00;
-    }
+        /* --- GENERAL STYLES --- */
+        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #0e1117; color: #333; }
+        a { text-decoration: none; color: inherit; }
+        
+        /* --- HEADER --- */
+        header { background: #1a1a1a; color: #fff; padding: 1rem 0; }
+        .container { width: 90%; max-width: 1200px; margin: auto; overflow: hidden; }
+        
+        .logo { 
+            float: left; font-size: 1.5rem; font-weight: bold; color: #f4b400; 
+            display: flex; align-items: center; 
+        }
+        /* Logo image styling */
+        .logo img { height: 50px; margin-right: 10px; }
 
-    /* Input Fields (Dark Grey background for contrast) */
-    .stTextInput > div > div > input, 
-    .stSelectbox > div > div > div, 
-    .stTextArea > div > div > textarea {
-        background-color: #262730;
-        color: white;
-    }
-    
-    /* Footer Styling */
-    .footer-text {
-        text-align: center; 
-        color: #888; 
-        padding: 20px; 
-        font-size: 14px;
-        border-top: 1px solid #333;
-    }
-    .footer-text a {
-        color: #f4b400;
-        text-decoration: none;
-    }
+        nav { float: right; margin-top: 10px; }
+        nav ul { list-style: none; padding: 0; margin: 0; }
+        nav ul li { display: inline; margin-left: 20px; }
+        nav a { color: #fff; font-weight: bold; }
+        nav a:hover { color: #f4b400; }
+
+        /* --- HERO SECTION --- */
+        #hero {
+            /* Uses the heavy-hauler-bg.jpg from your repo */
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('heavy-hauler-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 70vh;
+            color: #fff;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+        #hero h1 { font-size: 3rem; margin-bottom: 10px; text-transform: uppercase; color: #f4b400; }
+        #hero p { font-size: 1.2rem; margin-bottom: 30px; }
+        
+        .btn-main {
+            background: #f4b400; color: #000; padding: 12px 30px; 
+            font-weight: bold; border-radius: 5px; text-transform: uppercase;
+        }
+        .btn-main:hover { background: #d49b00; cursor: pointer; }
+
+        /* --- SERVICES SECTION --- */
+        #services { padding: 50px 0; text-align: center; background-color: #fff; }
+        .service-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; margin-top: 30px;
+        }
+        .service-card {
+            background: #f4f4f4; padding: 20px; border-radius: 8px; border-bottom: 4px solid #f4b400;
+        }
+
+        /* --- QUOTE FORM SECTION --- */
+        #quote { background: #222; color: #fff; padding: 50px 0; }
+        .quote-form input, .quote-form select, .quote-form textarea {
+            width: 100%; padding: 10px; margin-bottom: 15px; border: none; border-radius: 4px; box-sizing: border-box;
+        }
+        .quote-form button { width: 100%; border: none; cursor: pointer; }
+
+        /* --- FOOTER --- */
+        footer { background: #111; color: #aaa; padding: 20px 0; text-align: center; font-size: 0.9rem; }
+        footer p { margin: 5px 0; }
+        footer a { color: #f4b400; }
+
+        /* --- MOBILE --- */
+        @media(max-width: 768px) {
+            .logo, nav { float: none; display: block; text-align: center; }
+            nav { margin-top: 20px; }
+            #hero h1 { font-size: 2rem; }
+        }
     </style>
-""", unsafe_allow_html=True)
+</head>
+<body>
 
-# --- 3. HEADER & LOGO ---
-col1, col2 = st.columns([1, 5])
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="ladenpass-logo.png" alt="LadenPass Logo" onerror="this.style.display='none'"> 
+                LADENPASS
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#quote">Get a Quote</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-with col1:
-    # This tries to find the logo file in your GitHub repo root
-    try:
-        st.image("ladenpass-logo.png", width=120)
-    except:
-        # Fallback if image upload is forgotten
-        st.warning("⚠️ Upload ladenpass-logo.png to GitHub")
+    <section id="hero">
+        <h1>Heavy Haulage Specialists</h1>
+        <p>Reliable transport for Excavators, Plant & Machinery across Sydney & Regional NSW.</p>
+        <a href="#quote" class="btn-main">Get a Free Quote</a>
+    </section>
 
-with col2:
-    st.title("LADENPASS")
-    st.markdown("### Heavy Haulage & Machinery Transport | Sydney & Regional NSW")
+    <section id="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <p>Based in Padstow, serving the Greater Sydney Area.</p>
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>Excavator Transport</h3>
+                    <p>Safe loading and transport for excavators of all sizes.</p>
+                </div>
+                <div class="service-card">
+                    <h3>Plant Machinery</h3>
+                    <p>Bobcats, bulldozers, and heavy industrial equipment.</p>
+                </div>
+                <div class="service-card">
+                    <h3>Regional Haulage</h3>
+                    <p>Long-distance transport across New South Wales.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-# --- 4. HERO SECTION ---
-# Display the heavy hauler background
-try:
-    st.image("heavy-hauler-bg.jpg", use_container_width=True)
-except:
-    st.info("ℹ️ Upload heavy-hauler-bg.jpg to GitHub to see the banner here.")
+    <section id="quote">
+        <div class="container">
+            <h2 style="text-align: center; color: #f4b400;">Request a Transport Quote</h2>
+            
+            <form class="quote-form" action="https://formspree.io/f/your-form-id" method="POST">
+                
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+                
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="pickup" placeholder="Pickup Suburb (e.g. Yagoona)" required>
+                    <input type="text" name="dropoff" placeholder="Dropoff Suburb" required>
+                </div>
 
-# --- 5. SERVICES SECTION ---
-st.write("---")
-st.header("Our Services")
-st.write("Based in Padstow, serving the Greater Sydney Area and Regional NSW.")
+                <select name="machinery_type">
+                    <option value="" disabled selected>Select Machinery Type</option>
+                    <option value="excavator">Excavator</option>
+                    <option value="bobcat">Bobcat</option>
+                    <option value="vehicle">Vehicle/Car</option>
+                    <option value="other">Other Heavy Load</option>
+                </select>
 
-serv1, serv2, serv3 = st.columns(3)
+                <textarea name="details" rows="4" placeholder="Additional details (Dimensions, Weight, Preferred Date)"></textarea>
 
-with serv1:
-    st.subheader("🏗️ Excavator Transport")
-    st.write("Specialized transport for excavators (up to 20t). Safe loading protocols and chaining.")
+                <button type="submit" class="btn-main">Send Request</button>
+            </form>
+        </div>
+    </section>
 
-with serv2:
-    st.subheader("🚜 Plant Machinery")
-    st.write("Bobcats, bulldozers, forklifts, and industrial plant equipment.")
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 LadenPass Heavy Haulage.</p>
+            <p><strong>ABN:</strong> 16 632 316 240</p>
+            <p>
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a>
+            </p>
+        </div>
+    </footer>
 
-with serv3:
-    st.subheader("🛣️ Regional Haulage")
-    st.write("Long-distance heavy towing across NSW. (Sydney to Newcastle, Wollongong, Dubbo).")
+</body>
+</html>
+"""
 
-# --- 6. QUOTE FORM ---
-st.write("---")
-st.header("Request a Transport Quote")
-
-# Use a form container so the page doesn't reload on every keystroke
-with st.form("quote_form"):
-    c1, c2 = st.columns(2)
-    
-    with c1:
-        name = st.text_input("Contact Name")
-        phone = st.text_input("Phone Number")
-        pickup = st.text_input("Pickup Suburb (e.g. Yagoona)")
-    
-    with c2:
-        email = st.text_input("Email Address")
-        machinery = st.selectbox("Machinery Type", ["Excavator", "Bobcat", "Vehicle/Car", "Container", "Other"])
-        dropoff = st.text_input("Dropoff Suburb")
-    
-    details = st.text_area("Additional Details (Dimensions, Weight, Preferred Date)")
-    
-    # Submit Button
-    submitted = st.form_submit_button("Send Request")
-    
-    if submitted:
-        if not phone or not name:
-            st.error("Please provide your Name and Phone Number.")
-        else:
-            # SUCCESS MESSAGE
-            st.success(f"✅ Request Sent! Thank you {name}. We will call you on {phone} shortly to quote your {machinery} transport.")
-            st.info("Note: This is a demo form. In a live version, this would email you directly.")
-
-# --- 7. FOOTER (COMPLIANCE) ---
-st.markdown("---")
-st.markdown("""
-    <div class='footer-text'>
-        <p>&copy; 2026 LadenPass Heavy Haulage.</p>
-        <p><strong>ABN:</strong> 16 632 316 240</p>
-        <p>
-            <a href='#'>Privacy Policy</a> | 
-            <a href='#'>Terms of Service</a>
-        </p>
-    </div>
-""", unsafe_allow_html=True)
+# --- RENDER THE HTML ---
+# This function renders your custom HTML/CSS inside the Streamlit app.
+# height=2000 ensures the user can scroll through the whole page.
+components.html(html_code, height=2000, scrolling=True)
