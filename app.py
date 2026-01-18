@@ -216,6 +216,8 @@ def check_compliance(gcm, axles, width, height):
 # --- 5. SESSION STATE ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "user_type" not in st.session_state:
+    st.session_state.user_type = None
 
 # --- 6. SIDEBAR CONTENT ---
 with st.sidebar:
@@ -235,10 +237,12 @@ with st.sidebar:
     
     if st.session_state.logged_in:
         st.markdown("### Action Menu")
+        st.markdown(f"User: **{st.session_state.user_type}**")
         menu = st.radio("", ["📊 Dashboard", "✅ Run Auto-Check"], label_visibility="collapsed")
         st.markdown("---")
         if st.button("Log Out"):
             st.session_state.logged_in = False
+            st.session_state.user_type = None
             st.rerun()
         st.success("🟢 System Online")
     else:
@@ -290,6 +294,7 @@ if not st.session_state.logged_in:
         """, unsafe_allow_html=True)
 
     with c_login:
+        # --- LOGIN FORM ---
         with st.form("login_form"):
             st.subheader("Subscriber Login")
             username = st.text_input("Username")
@@ -298,20 +303,41 @@ if not st.session_state.logged_in:
             
             if submitted:
                 # --- [SECURE LOGIN IMPLEMENTATION] ---
-                # This checks for secrets first to prevent crashes if they aren't set up
                 try:
-                    valid_user = st.secrets["credentials"]["username"]
-                    valid_pass = st.secrets["credentials"]["password"]
+                    # 1. Fetch Credentials from Secrets
+                    admin_user = st.secrets["credentials"]["username"]
+                    admin_pass = st.secrets["credentials"]["password"]
                     
-                    if username == valid_user and password == valid_pass:
+                    # 2. Fetch Guest Credentials (Optional - uses .get to prevent crash if not set)
+                    guest_user = st.secrets.get("guest", {}).get("username", "none")
+                    guest_pass = st.secrets.get("guest", {}).get("password", "none")
+
+                    # 3. Validation Logic
+                    if username == admin_user and password == admin_pass:
                         st.session_state.logged_in = True
+                        st.session_state.user_type = "Admin"
+                        st.rerun()
+                    elif username == guest_user and password == guest_pass:
+                        st.session_state.logged_in = True
+                        st.session_state.user_type = "Guest/Trial"
                         st.rerun()
                     else:
                         st.error("Invalid credentials.")
                         
-                except Exception:
-                    st.error("⚠️ Security Config Missing. Please set up secrets.toml or Streamlit Secrets.")
-                    st.info("Instructions: Go to Settings > Secrets and add [credentials] block.")
+                except Exception as e:
+                    st.error("⚠️ System Error: Secrets not configured correctly.")
+                    st.info("Check Streamlit Settings > Secrets.")
+
+        # --- TRIAL REQUEST LINK (NEW) ---
+        st.markdown("""
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="margin-bottom: 10px;">Don't have a login?</p>
+                <a href="mailto:support@ladenpass.com.au?subject=Request 7-Day Free Trial&body=Hi, I would like to request a free trial code for LadenPass Enterprise." 
+                   style="background-color: transparent; border: 1px solid #4ade80; color: #4ade80; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block;">
+                   📩 Request 7-Day Free Trial
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
         # SUBSCRIBE BUTTON
         st.markdown("""
@@ -355,10 +381,10 @@ if not st.session_state.logged_in:
 # >>> VIEW 2: LOGGED IN AREA (AUTOMATED) <<<
 else:
     if "Dashboard" in menu:
-        st.markdown("""
+        st.markdown(f"""
         <div style="text-align: center; padding: 20px 0 30px 0;">
             <h1 style="font-size: 3rem;">Operations Dashboard</h1>
-            <p style="font-size: 1.1rem; opacity: 0.9;">Welcome back, Admin User.</p>
+            <p style="font-size: 1.1rem; opacity: 0.9;">Welcome back, {st.session_state.user_type} User.</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -415,8 +441,7 @@ else:
                     
                 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- FOOTER (NOW WITH LEGAL EXPANDERS) ---
-# [Step 2: Legal Implementation] - This section handles the legal text.
+# --- FOOTER & LEGAL ---
 st.markdown("<br><hr>", unsafe_allow_html=True)
 st.markdown("""
     <div class="disclaimer">
@@ -430,11 +455,9 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Legal Expanders (Keeps text hidden until clicked)
 with st.expander("📜 Privacy Policy"):
     st.write("""
     **Privacy Policy for LadenPass**
-    
     1. **Data Collection:** We collect user input (vehicle dimensions) and login credentials for functional purposes only.
     2. **Usage:** Data is used to calculate compliance checks and is not sold to third parties.
     3. **Storage:** No vehicle data is permanently stored in this version of the application.
@@ -444,7 +467,6 @@ with st.expander("📜 Privacy Policy"):
 with st.expander("⚖️ Terms of Service"):
     st.write("""
     **Terms of Service**
-    
     1. **Not Legal Advice:** The outputs of this tool are for estimation only. 
     2. **NHVR Authority:** Always consult the official NHVR portal before transport.
     3. **Liability:** LadenPass is not liable for fines incurred based on these calculations.
