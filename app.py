@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="LadenPass | Automated Compliance",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded" # This sets it open, CSS below keeps it open
 )
 
 # --- 2. STATE MANAGEMENT ---
@@ -30,10 +30,24 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. PROFESSIONAL STYLING (FULL SUITE) ---
+# --- 4. PROFESSIONAL STYLING (WITH SIDEBAR LOCK) ---
 st.markdown("""
     <style>
-    /* 1. GLOBAL RESET & THEME */
+    /* 1. SIDEBAR LOCK (PREVENTS DISAPPEARING) */
+    [data-testid="stSidebar"] {
+        min-width: 320px !important;
+        max-width: 320px !important;
+    }
+    /* Hide the little arrow button that collapses the sidebar */
+    [data-testid="stSidebar"] button[kind="header"] {
+        display: none !important;
+    }
+    /* Hide the expand button in case it somehow collapses */
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+
+    /* 2. GLOBAL RESET & THEME */
     div[data-testid="stAppViewContainer"] {
         height: 100vh;
         overflow-y: auto;
@@ -51,19 +65,19 @@ st.markdown("""
         max-width: 1400px;
     }
 
-    /* 2. TYPOGRAPHY */
+    /* 3. TYPOGRAPHY */
     h1 { color: #ffffff !important; font-size: 2.5rem !important; font-weight: 700 !important; margin-bottom: 5px !important; }
     h2 { color: #4ade80 !important; font-size: 1.5rem !important; margin-top: 0px !important; font-weight: 300 !important; }
     h3 { color: #ffffff !important; font-size: 1.2rem !important; font-weight: 600 !important; }
     p, li, label, span, div { color: #cbd5e1 !important; font-size: 0.9rem !important; }
     
-    /* 3. SIDEBAR (SOLID GREEN THEME) */
+    /* 4. SIDEBAR (SOLID GREEN THEME) */
     [data-testid="stSidebar"] {
         background-color: #064e3b !important;
         border-right: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* 4. SIDEBAR WIDGETS (PROFILE & STATUS) */
+    /* 5. SIDEBAR WIDGETS */
     .sidebar-card {
         background-color: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -91,7 +105,7 @@ st.markdown("""
         animation: pulse-green 2s infinite;
     }
 
-    /* 5. MAIN CONTENT COMPONENTS */
+    /* 6. MAIN CONTENT COMPONENTS */
     .glass-card, [data-testid="stForm"], .control-panel, .metric-card {
         background-color: rgba(15, 23, 42, 0.75); 
         backdrop-filter: blur(12px);
@@ -106,7 +120,7 @@ st.markdown("""
     .metric-value { font-size: 2rem; font-weight: 800; color: #ffffff; margin: 5px 0; }
     .metric-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
     
-    /* 6. INPUTS & BUTTONS */
+    /* 7. INPUTS & BUTTONS */
     .stTextInput input, .stNumberInput input {
         background-color: #1e293b !important;
         color: white !important;
@@ -128,13 +142,13 @@ st.markdown("""
     }
     .stButton > button:hover { background-color: #059669 !important; }
 
-    /* 7. REMOVE DECORATIONS */
+    /* 8. REMOVE DECORATIONS */
     header, footer, #MainMenu {visibility: hidden;}
     
-    /* 8. DATAFRAME */
+    /* 9. DATAFRAME */
     [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; }
     
-    /* 9. SUBSCRIBE BUTTON */
+    /* 10. SUBSCRIBE BUTTON */
     .subscribe-btn-container { display: flex; justify-content: center; margin-top: 20px; }
     .subscribe-btn {
         display: inline-block;
@@ -150,14 +164,14 @@ st.markdown("""
         text-align: center;
     }
     
-    /* 10. ANIMATIONS */
+    /* 11. ANIMATIONS */
     @keyframes pulse-green {
         0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
         70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
         100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
     }
     
-    /* 11. SALES POINTS */
+    /* 12. SALES POINTS */
     .sales-point {
         background-color: rgba(6, 78, 59, 0.6);
         border-left: 4px solid #4ade80;
@@ -167,7 +181,7 @@ st.markdown("""
     }
     .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; font-weight: bold !important; }
     
-    /* 12. TRUST BAR */
+    /* 13. TRUST BAR */
     .trust-bar {
         margin-top: 40px;
         display: flex;
@@ -239,7 +253,7 @@ def check_compliance(gcm, axles, width, height):
     
     return report
 
-# --- 6. SIDEBAR (PROFESSIONAL UPGRADE) ---
+# --- 6. SIDEBAR (PROFESSIONAL & LOCKED) ---
 with st.sidebar:
     # A. LOGO
     if logo_b64:
@@ -248,7 +262,7 @@ with st.sidebar:
         st.markdown("""<div class="logo-container" style="background:white; padding:10px; border-radius:8px; margin-bottom:20px; text-align:center;"><p style="color:#064e3b !important; font-size: 20px; font-weight: bold; margin: 0;">LadenPass</p></div>""", unsafe_allow_html=True)
     
     if st.session_state.logged_in:
-        # B. USER PROFILE CARD (Replaces simple text)
+        # B. USER PROFILE CARD
         user_role = "ADMIN" if st.session_state.user_type == "Admin" else "TRIAL"
         st.markdown(f"""
         <div class="sidebar-card">
@@ -262,11 +276,14 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        # C. NAVIGATION (Styled Header + Radio)
+        # C. NAVIGATION
         st.markdown("<p style='font-size:0.75rem; color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-top:20px; margin-bottom:10px;'>MENU</p>", unsafe_allow_html=True)
         menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
         
-        # D. SYSTEM STATUS WIDGET
+        # >>> FUTURE ADDITIONS GO HERE <<<
+        # Example: if st.button("⚙️ Settings"): pass
+
+        # D. SYSTEM STATUS
         st.markdown("""
         <div class="sidebar-card" style="margin-top:20px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -279,7 +296,7 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        # E. LOGOUT (Discrete)
+        # E. LOGOUT
         st.markdown("---")
         if st.button("LOG OUT"):
             st.session_state.logged_in = False
