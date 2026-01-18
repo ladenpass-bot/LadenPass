@@ -21,14 +21,17 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 3. COMPACT PROFESSIONAL STYLING (CSS) ---
+# --- 3. PROFESSIONAL STYLING (CSS) ---
 st.markdown("""
     <style>
-    /* COMPACT LAYOUT: REMOVE EXTRA PADDING */
-    .block-container { 
-        padding-top: 1rem !important; 
-        padding-bottom: 0rem !important; 
-        max-width: 95% !important;
+    /* VERTICAL CENTERING FIX */
+    div.block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 85vh; /* Forces content to center vertically */
     }
 
     /* GLOBAL THEME */
@@ -41,9 +44,9 @@ st.markdown("""
         background-attachment: fixed;
     }
 
-    /* COMPACT TYPOGRAPHY */
-    h1 { color: #ffffff !important; font-size: 2.2rem !important; margin-bottom: 0px !important; }
-    h2 { color: #ffffff !important; font-size: 1.2rem !important; margin-top: 0px !important; font-weight: 300 !important; }
+    /* TYPOGRAPHY */
+    h1 { color: #ffffff !important; font-size: 2.5rem !important; font-weight: 700 !important; margin-bottom: 5px !important; }
+    h2 { color: #4ade80 !important; font-size: 1.2rem !important; margin-top: 0px !important; font-weight: 300 !important; }
     h3 { color: #ffffff !important; font-size: 1.1rem !important; }
     p, li, label, span, div { color: #cbd5e1 !important; font-size: 0.9rem !important; }
     
@@ -70,62 +73,64 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 15px;
-        border-radius: 8px;
+        padding: 20px;
+        border-radius: 10px;
         height: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
-    /* COMPACT SALES POINTS */
+    /* SALES POINTS */
     .sales-point {
         background-color: rgba(6, 78, 59, 0.4);
-        border-left: 3px solid #4ade80;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        border-radius: 0 6px 6px 0;
+        border-left: 4px solid #4ade80;
+        padding: 12px 15px;
+        margin-bottom: 12px;
+        border-radius: 0 8px 8px 0;
+        transition: transform 0.2s;
     }
-    .sales-point h4 { margin: 0 !important; font-size: 1rem !important; color: white !important; }
+    .sales-point:hover { transform: translateX(5px); }
+    .sales-point h4 { margin: 0 !important; font-size: 1rem !important; color: white !important; font-weight: bold !important; }
     .sales-point p { margin: 2px 0 0 0 !important; font-size: 0.85rem !important; opacity: 0.9; }
+
+    /* FORM CONTAINER */
+    [data-testid="stForm"] {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 25px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
 
     /* INPUTS & BUTTONS */
     .stTextInput input {
         background-color: #ffffff !important;
         color: #0f172a !important;
         border-radius: 4px;
-        padding: 8px;
-        font-size: 0.9rem;
+        padding: 10px;
     }
-    
     .stButton > button {
         background-color: #22c55e !important;
         color: white !important;
         border: none;
         font-weight: 600;
         width: 100%;
-        padding: 0.4rem;
+        padding: 10px;
         margin-top: 5px;
     }
     .stButton > button:hover { background-color: #16a34a !important; }
-
-    /* COMPACT FORM */
-    [data-testid="stForm"] {
-        background-color: rgba(255, 255, 255, 0.05);
-        padding: 20px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-    }
 
     /* SUBSCRIBE BUTTON */
     .subscribe-btn-container {
         display: flex;
         justify-content: center;
-        margin-top: 10px;
+        margin-top: 15px;
     }
     .subscribe-btn {
         display: inline-block;
         background: linear-gradient(45deg, #f59e0b, #d97706);
         color: white !important;
-        padding: 10px 25px;
+        padding: 12px 30px;
         border-radius: 30px;
         text-decoration: none;
         font-weight: bold;
@@ -133,36 +138,33 @@ st.markdown("""
         border: 1px solid rgba(255,255,255,0.2);
         width: 100%;
         text-align: center;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
     }
     .subscribe-btn:hover {
         color: white !important;
-        text-decoration: none;
+        transform: translateY(-2px);
     }
     
-    /* COMPACT TRUST BAR */
+    /* TRUST BAR */
     .trust-bar {
-        background-color: rgba(255, 255, 255, 0.03);
-        border-top: 1px solid rgba(255,255,255,0.1);
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding: 10px;
-        margin-top: 15px;
-        border-radius: 8px;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
     }
-    .trust-item { text-align: center; margin: 0 10px; }
-    .trust-icon { font-size: 1.2rem; display: block; margin-bottom: 2px; }
-    .trust-label { font-weight: bold; color: white !important; font-size: 0.8rem; }
-    .trust-sub { font-size: 0.7rem; color: #94a3b8 !important; }
+    .trust-item { text-align: center; opacity: 0.8; }
+    .trust-icon { font-size: 1.2rem; display: block; margin-bottom: 5px; }
+    .trust-label { font-weight: bold; color: white !important; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
 
-    /* DISCLAIMER FOOTER */
-    .disclaimer {
-        font-size: 0.7rem;
-        color: #64748b !important;
+    /* FOOTER */
+    .footer-container {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
         text-align: center;
-        margin-top: 10px;
-        padding-top: 5px;
-        border-top: 1px solid #334155;
     }
-    .footer-links a { color: #f59e0b !important; margin: 0 10px; text-decoration: none; font-size: 0.7rem; }
+    .footer-text { font-size: 0.75rem; color: #64748b; }
+    .footer-links a { color: #f59e0b !important; margin: 0 10px; text-decoration: none; font-size: 0.75rem; }
     
     #MainMenu, footer, header {visibility: hidden;}
     </style>
@@ -242,17 +244,18 @@ with st.sidebar:
 
 # --- 7. MAIN CONTENT ---
 
-# >>> VIEW 1: LANDING PAGE (COMPACT) <<<
+# >>> VIEW 1: LANDING PAGE (VERTICALLY CENTERED) <<<
 if not st.session_state.logged_in:
-    # COMPACT HEADER
+    
+    # 1. HEADER SECTION
     st.markdown("""
-    <div style="text-align: left; padding-bottom: 20px;">
+    <div style="text-align: left; margin-bottom: 30px;">
         <h1>LadenPass Enterprise</h1>
         <h2>Heavy Haulage Compliance. Simplified.</h2>
     </div>
     """, unsafe_allow_html=True)
     
-    # SPLIT LAYOUT
+    # 2. SPLIT LAYOUT (SALES & LOGIN)
     c_sales, c_login = st.columns([1.6, 1])
     
     with c_sales:
@@ -271,22 +274,20 @@ if not st.session_state.logged_in:
         </div>
         """, unsafe_allow_html=True)
 
-        # TRUST BAR (Moved inside column for compactness)
+        # TRUST ICONS (BELOW SALES POINTS)
         st.markdown("""
         <div class="trust-bar">
-            <div style="display: flex; justify-content: space-between; text-align: center;">
-                <div class="trust-item">
-                    <span class="trust-icon">👷‍♂️</span>
-                    <div class="trust-label">Industry Ready</div>
-                </div>
-                <div class="trust-item">
-                    <span class="trust-icon">✅</span>
-                    <div class="trust-label">NHVR Compliant</div>
-                </div>
-                 <div class="trust-item">
-                    <span class="trust-icon">🔒</span>
-                    <div class="trust-label">AES-256 Secure</div>
-                </div>
+            <div class="trust-item">
+                <span class="trust-icon">👷‍♂️</span>
+                <div class="trust-label">Industry Ready</div>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon">✅</span>
+                <div class="trust-label">NHVR Compliant</div>
+            </div>
+             <div class="trust-item">
+                <span class="trust-icon">🔒</span>
+                <div class="trust-label">AES-256 Secure</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -318,11 +319,11 @@ if not st.session_state.logged_in:
                 except:
                     st.error("⚠️ Secrets Error.")
 
-        # TRIAL & SUBSCRIBE (Compact)
+        # TRIAL & SUBSCRIBE
         st.markdown("""
-            <div style="text-align: center; margin-top: 10px;">
+            <div style="text-align: center; margin-top: 15px;">
                 <a href="mailto:support@ladenpass.com.au?subject=Request Trial&body=Hi, request for trial code." 
-                   style="color: #4ade80; text-decoration: none; font-size: 0.9rem;">
+                   style="color: #4ade80; text-decoration: none; font-size: 0.85rem; border-bottom: 1px dotted #4ade80;">
                    📩 Request Free Trial Code
                 </a>
             </div>
@@ -333,13 +334,17 @@ if not st.session_state.logged_in:
             </div>
         """, unsafe_allow_html=True)
 
-    # DISCLAIMER (Very Compact)
+    # 3. PROFESSIONAL FOOTER (FILLS BOTTOM)
     st.markdown("""
-        <div class="disclaimer">
-            Estimates only. Not a legal permit. Must be lodged with NHVR.
-            <br>
-            <a href="#" style="color:#f59e0b; text-decoration:none;">Privacy</a> | 
-            <a href="#" style="color:#f59e0b; text-decoration:none;">Terms</a>
+        <div class="footer-container">
+            <div class="footer-text">
+                Estimates only. Not a legal permit. Must be lodged with NHVR.
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a> &bull; 
+                <a href="#">Terms of Service</a> &bull; 
+                <a href="#">Support</a>
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
