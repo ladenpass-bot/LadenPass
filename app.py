@@ -22,7 +22,7 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 3. PROFESSIONAL STYLING (GLASS RESTORED) ---
+# --- 3. PROFESSIONAL STYLING (DARK BLUE THEME RESTORED) ---
 st.markdown("""
     <style>
     /* 1. VERTICAL CENTERING LAYOUT */
@@ -40,7 +40,7 @@ st.markdown("""
         padding-bottom: 2rem !important;
     }
 
-    /* 2. GLOBAL THEME */
+    /* 2. GLOBAL THEME (Dark Blue Background) */
     .stApp {
         background-color: #0f172a; 
         background-image: linear-gradient(rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.96)), 
@@ -79,9 +79,9 @@ st.markdown("""
         align-items: center;
     }
 
-    /* 7. GLASS CARDS */
+    /* 7. GLASS CARDS (DARKER / MORE SUBTLE - RESTORED) */
     .glass-card {
-        background-color: rgba(255, 255, 255, 0.08); /* Increased visibility */
+        background-color: rgba(255, 255, 255, 0.05); /* Low opacity for dark look */
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 20px;
@@ -90,21 +90,20 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
-    /* 8. SALES POINTS (LIGHTER GREEN TO POP ON DARK BG) */
+    /* 8. SALES POINTS (DARK GREEN TINT - RESTORED) */
     .sales-point {
-        background-color: rgba(6, 78, 59, 0.5); /* Slightly less transparent */
+        background-color: rgba(6, 78, 59, 0.4); /* Dark Green Tint */
         border-left: 4px solid #4ade80;
         padding: 15px;
         margin-bottom: 15px;
         border-radius: 0 8px 8px 0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
     .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; font-weight: bold !important; }
-    .sales-point p { margin: 2px 0 0 0 !important; font-size: 0.9rem !important; opacity: 1.0 !important; }
+    .sales-point p { margin: 2px 0 0 0 !important; font-size: 0.9rem !important; opacity: 0.9; }
 
-    /* 9. FORM CONTAINER (LIGHTER GLASS) */
+    /* 9. FORM CONTAINER (DARK GLASS - RESTORED) */
     [data-testid="stForm"] {
-        background-color: rgba(255, 255, 255, 0.08); /* Lighter glass effect */
+        background-color: rgba(255, 255, 255, 0.05); /* Low opacity for dark look */
         padding: 30px;
         border-radius: 10px;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -224,7 +223,7 @@ if "logged_in" not in st.session_state:
 if "user_type" not in st.session_state:
     st.session_state.user_type = None
 
-# --- 6. SIDEBAR CONTENT (WITH SPECIAL OFFER) ---
+# --- 6. SIDEBAR CONTENT (WITH FUTURE ADDITIONS SLOT) ---
 with st.sidebar:
     # A. LOGO
     if logo_b64:
@@ -238,6 +237,9 @@ with st.sidebar:
         st.markdown(f"User: **{st.session_state.user_type}**")
         menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
         
+        # >>> FUTURE ADDITIONS GO HERE <<<
+        # Example: st.button("⚙️ Settings")
+        
         st.markdown("---")
         if st.button("Log Out"):
             st.session_state.logged_in = False
@@ -248,7 +250,7 @@ with st.sidebar:
     else:
         st.info("🔒 Secure Access")
         
-        # --- [NEW] ATTENTION GRABBING TRIAL OFFER ---
+        # --- 7-DAY TRIAL OFFER (IN SIDEBAR) ---
         st.markdown("""
         <div style="
             background-color: #065f46; 
