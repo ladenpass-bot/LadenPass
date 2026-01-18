@@ -1,4 +1,3 @@
-
 import streamlit as st
 import base64
 import datetime
@@ -10,7 +9,7 @@ st.set_page_config(
     page_title="LadenPass | Automated Compliance",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded" # This asks the browser to open it.
+    initial_sidebar_state="expanded" 
 )
 
 # --- 2. STATE MANAGEMENT ---
@@ -31,36 +30,15 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. ADVANCED CSS TROUBLESHOOTING & STYLING ---
+# --- 4. PROFESSIONAL STYLING (ENHANCED TYPOGRAPHY) ---
 st.markdown("""
     <style>
-    /* >>> CRITICAL FIX: SIDEBAR VISIBILITY <<< */
-    
-    /* 1. If sidebar is CLOSED, force the 'Open' arrow (>) to be VISIBLE and GREEN */
-    [data-testid="collapsedControl"] {
-        display: block !important;
-        color: #4ade80 !important; /* Bright Green Arrow */
-        background-color: rgba(6, 78, 59, 0.8) !important; /* Dark Green box behind it */
-        border-radius: 5px;
-        z-index: 100000 !important; /* Force it on top of everything */
-    }
+    /* 1. SIDEBAR LOCK */
+    button[aria-label="Collapse sidebar"] { display: none !important; }
+    [data-testid="collapsedControl"] { display: block !important; color: #4ade80 !important; background-color: rgba(6, 78, 59, 0.8) !important; border-radius: 5px; z-index: 100000 !important; }
+    section[data-testid="stSidebar"] { min-width: 320px !important; max-width: 320px !important; background-color: #064e3b !important; border-right: 1px solid rgba(255,255,255,0.1); }
 
-    /* 2. Once sidebar is OPEN, hide the 'Close' X button so it stays open */
-    section[data-testid="stSidebar"] button[kind="header"] {
-        display: none !important;
-    }
-
-    /* 3. Force the Sidebar Background to be the correct Green */
-    section[data-testid="stSidebar"] {
-        background-color: #064e3b !important;
-        border-right: 1px solid rgba(255,255,255,0.1);
-        min-width: 320px !important;
-        max-width: 320px !important;
-    }
-
-    /* >>> REST OF PROFESSIONAL THEME <<< */
-
-    /* GLOBAL THEME */
+    /* 2. GLOBAL RESET & THEME */
     div[data-testid="stAppViewContainer"] {
         height: 100vh;
         overflow-y: auto;
@@ -73,134 +51,158 @@ st.markdown("""
     
     div.block-container {
         min-height: 90vh !important;
-        padding-top: 2rem !important;
-        padding-bottom: 2rem !important;
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
         max-width: 1400px;
     }
 
-    /* TYPOGRAPHY */
-    h1 { color: #ffffff !important; font-size: 2.5rem !important; font-weight: 700 !important; margin-bottom: 5px !important; }
-    h2 { color: #4ade80 !important; font-size: 1.5rem !important; margin-top: 0px !important; font-weight: 300 !important; }
-    h3 { color: #ffffff !important; font-size: 1.2rem !important; font-weight: 600 !important; }
-    p, li, label, span, div { color: #cbd5e1 !important; font-size: 0.9rem !important; }
+    /* 3. ENHANCED TYPOGRAPHY (BIGGER & CLEARER) */
+    h1 { 
+        color: #ffffff !important; 
+        font-size: 3.5rem !important; /* Larger Main Title */
+        font-weight: 800 !important; 
+        margin-bottom: 10px !important; 
+        letter-spacing: -1px;
+    }
+    h2 { 
+        color: #4ade80 !important; 
+        font-size: 2rem !important; /* Larger Subtitles */
+        margin-top: 0px !important; 
+        font-weight: 400 !important; 
+    }
+    h3 { 
+        color: #ffffff !important; 
+        font-size: 1.5rem !important; /* Larger Widget Headers */
+        font-weight: 600 !important; 
+        margin-bottom: 10px !important;
+    }
+    p, li, label, div { 
+        color: #cbd5e1 !important; 
+        font-size: 1.1rem !important; /* Base text increased from 0.9rem to 1.1rem */
+        line-height: 1.6 !important; /* Better spacing between lines */
+    }
+    span {
+        font-size: inherit; /* Ensure spans inherit the larger size */
+    }
     
-    /* SIDEBAR WIDGETS */
+    /* 4. SIDEBAR WIDGETS */
     .sidebar-card {
         background-color: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: 20px; /* More padding */
+        margin-bottom: 20px;
     }
     .user-badge {
         background-color: #f59e0b;
         color: white;
-        padding: 2px 8px;
+        padding: 4px 10px;
         border-radius: 4px;
-        font-size: 0.7rem;
+        font-size: 0.8rem; /* Larger Badge */
         font-weight: bold;
         text-transform: uppercase;
     }
     .status-dot {
-        height: 10px;
-        width: 10px;
+        height: 12px; /* Larger Dot */
+        width: 12px;
         background-color: #4ade80;
         border-radius: 50%;
         display: inline-block;
-        margin-right: 8px;
+        margin-right: 10px;
         box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
         animation: pulse-green 2s infinite;
     }
 
-    /* GLASS CARDS */
+    /* 5. MAIN CONTENT COMPONENTS */
     .glass-card, [data-testid="stForm"], .control-panel, .metric-card {
         background-color: rgba(15, 23, 42, 0.75); 
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 20px;
+        padding: 30px; /* More breathing room */
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     /* METRICS */
-    .metric-value { font-size: 2rem; font-weight: 800; color: #ffffff; margin: 5px 0; }
-    .metric-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+    .metric-value { font-size: 2.5rem; font-weight: 800; color: #ffffff; margin: 5px 0; }
+    .metric-label { font-size: 1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .metric-delta { font-size: 0.9rem; margin-top: 5px; }
     
-    /* INPUTS & BUTTONS */
+    /* 6. INPUTS & BUTTONS (LARGER TOUCH TARGETS) */
     .stTextInput input, .stNumberInput input {
         background-color: #1e293b !important;
         color: white !important;
         border: 1px solid #334155;
         border-radius: 6px;
-        padding: 10px;
+        padding: 12px 15px; /* Larger click area */
+        font-size: 1.1rem !important; /* Larger input text */
     }
     .stButton > button {
         background-color: #10b981 !important;
         color: white !important;
         border: none;
         font-weight: 700;
-        font-size: 1rem;
+        font-size: 1.1rem; /* Larger button text */
         width: 100%;
-        padding: 12px;
+        padding: 15px; /* Taller button */
         border-radius: 6px;
         text-transform: uppercase;
         margin-top: 10px;
     }
     .stButton > button:hover { background-color: #059669 !important; }
 
-    /* REMOVE DECORATIONS */
+    /* 7. REMOVE DECORATIONS */
     header, footer, #MainMenu {visibility: hidden;}
     
-    /* DATAFRAME */
-    [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; }
+    /* 8. DATAFRAME */
+    [data-testid="stDataFrame"] { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 1rem !important; }
     
-    /* SUBSCRIBE BUTTON */
-    .subscribe-btn-container { display: flex; justify-content: center; margin-top: 20px; }
+    /* 9. SUBSCRIBE BUTTON */
+    .subscribe-btn-container { display: flex; justify-content: center; margin-top: 25px; }
     .subscribe-btn {
         display: inline-block;
         background: linear-gradient(45deg, #f59e0b, #ea580c);
         color: white !important;
-        padding: 12px 40px;
+        padding: 15px 50px;
         border-radius: 8px;
         text-decoration: none;
         font-weight: bold;
-        font-size: 1rem;
+        font-size: 1.2rem; /* Big readable button */
         border: 1px solid rgba(255,255,255,0.2);
         width: 100%;
         text-align: center;
     }
     
-    /* ANIMATIONS */
+    /* 10. ANIMATIONS */
     @keyframes pulse-green {
         0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
         70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
         100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
     }
     
-    /* SALES POINTS */
+    /* 11. SALES POINTS */
     .sales-point {
         background-color: rgba(6, 78, 59, 0.6);
-        border-left: 4px solid #4ade80;
-        padding: 15px;
-        margin-bottom: 15px;
+        border-left: 5px solid #4ade80;
+        padding: 20px;
+        margin-bottom: 20px;
         border-radius: 4px;
     }
-    .sales-point h4 { margin: 0 !important; font-size: 1.1rem !important; color: white !important; font-weight: bold !important; }
+    .sales-point h4 { margin: 0 !important; font-size: 1.3rem !important; color: white !important; font-weight: bold !important; }
     
-    /* TRUST BAR */
+    /* 12. TRUST BAR */
     .trust-bar {
-        margin-top: 40px;
+        margin-top: 50px;
         display: flex;
         justify-content: space-around;
-        padding: 0 10px;
+        padding: 20px 10px;
         border-top: 1px solid rgba(255,255,255,0.1);
-        padding-top: 20px;
     }
     .trust-item { text-align: center; opacity: 1.0; }
-    .trust-icon { font-size: 1.2rem; display: block; margin-bottom: 5px; color: #f59e0b; }
-    .trust-label { font-weight: bold; color: white !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-    .trust-sub { font-size: 0.7rem; color: #94a3b8; }
+    .trust-icon { font-size: 1.8rem; display: block; margin-bottom: 10px; color: #f59e0b; }
+    .trust-label { font-weight: bold; color: white !important; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+    .trust-sub { font-size: 0.9rem; color: #94a3b8; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -274,9 +276,9 @@ with st.sidebar:
         st.markdown(f"""
         <div class="sidebar-card">
             <div style="display:flex; align-items:center;">
-                <div style="font-size:1.5rem; margin-right:10px;">👤</div>
+                <div style="font-size:2rem; margin-right:15px;">👤</div>
                 <div>
-                    <div style="color:white; font-weight:bold; font-size:0.9rem;">{st.session_state.user_type} Account</div>
+                    <div style="color:white; font-weight:bold; font-size:1.1rem;">{st.session_state.user_type}</div>
                     <span class="user-badge">{user_role} ACCESS</span>
                 </div>
             </div>
@@ -284,18 +286,18 @@ with st.sidebar:
         """, unsafe_allow_html=True)
 
         # C. NAVIGATION
-        st.markdown("<p style='font-size:0.75rem; color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-top:20px; margin-bottom:10px;'>MENU</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:0.9rem; color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-top:25px; margin-bottom:15px;'>MENU</p>", unsafe_allow_html=True)
         menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
         
         # D. SYSTEM STATUS
         st.markdown("""
-        <div class="sidebar-card" style="margin-top:20px;">
+        <div class="sidebar-card" style="margin-top:25px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.8rem; color:#cbd5e1;">System Status</span>
-                <span style="font-size:0.8rem; color:#4ade80;">99.9%</span>
+                <span style="font-size:0.9rem; color:#cbd5e1;">System Status</span>
+                <span style="font-size:0.9rem; color:#4ade80;">99.9%</span>
             </div>
-            <div style="margin-top:5px;">
-                <span class="status-dot"></span> <span style="font-size:0.8rem; color:white;">Operational</span>
+            <div style="margin-top:10px;">
+                <span class="status-dot"></span> <span style="font-size:0.9rem; color:white;">Operational</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -310,17 +312,17 @@ with st.sidebar:
 
     else:
         # LANDING PAGE SIDEBAR
-        st.markdown("""<div style="background-color:#042f2e; border-left:4px solid #10b981; padding:12px; border-radius:4px; color:#94a3b8; font-size:0.85rem; margin-bottom:20px;"><span>🔒</span> <strong>Secure Access</strong></div>""", unsafe_allow_html=True)
-        st.markdown("""<div style="background-color:rgba(6,78,59,0.4); border:2px solid #10b981; border-radius:8px; padding:15px; text-align:center; animation:pulse-green 2s infinite;"><h3 style="color:white; margin:0 0 10px 0; font-size:1rem;">🎉 7-Day Free Trial</h3><p style="color:#cbd5e1; font-size:0.8rem;">Test drive instantly.</p><div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:4px; margin-top:10px;"><div style="color:#34d399; font-weight:bold; font-size:0.85rem;">User: guest</div><div style="color:#34d399; font-weight:bold; font-size:0.85rem;">Pass: tryladenpass</div></div></div>""", unsafe_allow_html=True)
+        st.markdown("""<div style="background-color:#042f2e; border-left:4px solid #10b981; padding:15px; border-radius:4px; color:#94a3b8; font-size:1rem; margin-bottom:25px;"><span>🔒</span> <strong>Secure Access</strong></div>""", unsafe_allow_html=True)
+        st.markdown("""<div style="background-color:rgba(6,78,59,0.4); border:2px solid #10b981; border-radius:8px; padding:20px; text-align:center; animation:pulse-green 2s infinite;"><h3 style="color:white; margin:0 0 10px 0; font-size:1.2rem;">🎉 7-Day Free Trial</h3><p style="color:#cbd5e1; font-size:1rem;">Test drive instantly.</p><div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:4px; margin-top:10px;"><div style="color:#34d399; font-weight:bold; font-size:1rem;">User: guest</div><div style="color:#34d399; font-weight:bold; font-size:1rem;">Pass: tryladenpass</div></div></div>""", unsafe_allow_html=True)
     
-    st.markdown(f"""<div style='text-align:center; font-size:0.7rem; color:#cbd5e1; margin-top:40px; opacity:0.6;'>© {datetime.datetime.now().year} LadenPass<br>ABN: 16 632 316 240</div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div style='text-align:center; font-size:0.85rem; color:#cbd5e1; margin-top:50px; opacity:0.6;'>© {datetime.datetime.now().year} LadenPass<br>ABN: 16 632 316 240</div>""", unsafe_allow_html=True)
 
 
 # --- 7. MAIN CONTENT ---
 
 # >>> VIEW 1: LANDING PAGE <<<
 if not st.session_state.logged_in:
-    st.markdown("""<div style="text-align:left; margin-bottom:30px;"><h1>LadenPass Enterprise</h1><h2>Heavy Haulage Compliance. Simplified.</h2></div>""", unsafe_allow_html=True)
+    st.markdown("""<div style="text-align:left; margin-bottom:40px;"><h1>LadenPass Enterprise</h1><h2>Heavy Haulage Compliance. Simplified.</h2></div>""", unsafe_allow_html=True)
     
     c_sales, c_login = st.columns([1.6, 1])
     
@@ -374,11 +376,11 @@ if not st.session_state.logged_in:
     
     st.markdown("""<div class="trust-bar"><div class="trust-item"><span class="trust-icon">👤</span><div class="trust-label">Industry Ready</div></div><div class="trust-item"><span class="trust-icon">✅</span><div class="trust-label">NHVR Compliant</div></div><div class="trust-item"><span class="trust-icon">🔒</span><div class="trust-label">AES-256 Secure</div></div></div>""", unsafe_allow_html=True)
 
-# >>> VIEW 2: LOGGED IN DASHBOARD (PROFESSIONAL) <<<
+# >>> VIEW 2: LOGGED IN DASHBOARD <<<
 else:
     # Header
     st.markdown(f"""
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
             <h1>Operations Command</h1>
             <p>Session Active: {st.session_state.user_type}</p>
@@ -418,10 +420,10 @@ else:
         with col_side:
             st.markdown("### 🛠️ Driver Toolkit")
             st.markdown("""
-            <div class="glass-card" style="padding:15px;">
-                <p style="margin-bottom:15px;">Quick access to official external resources.</p>
-                <a href="https://www.nhvr.gov.au/road-access/route-planner" target="_blank" style="display:block; background:#1e293b; color:white; padding:10px; border-radius:6px; margin-bottom:10px; text-decoration:none; border:1px solid #334155;">🗺️ NHVR Route Planner</a>
-                <a href="https://www.nhvr.gov.au/law-policies/notices-and-permit-based-schemes/national-notices" target="_blank" style="display:block; background:#1e293b; color:white; padding:10px; border-radius:6px; margin-bottom:10px; text-decoration:none; border:1px solid #334155;">📜 National Gazettes</a>
+            <div class="glass-card" style="padding:20px;">
+                <p style="margin-bottom:20px;">Quick access to official external resources.</p>
+                <a href="https://www.nhvr.gov.au/road-access/route-planner" target="_blank" style="display:block; background:#1e293b; color:white; padding:12px; border-radius:6px; margin-bottom:12px; text-decoration:none; border:1px solid #334155;">🗺️ NHVR Route Planner</a>
+                <a href="https://www.nhvr.gov.au/law-policies/notices-and-permit-based-schemes/national-notices" target="_blank" style="display:block; background:#1e293b; color:white; padding:12px; border-radius:6px; margin-bottom:12px; text-decoration:none; border:1px solid #334155;">📜 National Gazettes</a>
             </div>
             """, unsafe_allow_html=True)
 
@@ -449,22 +451,22 @@ else:
                     <div class="metric-card" style="background:white; color:#0f172a; border-left: 10px solid {result['color']}; margin-top:20px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <h3 style="margin:0; color:#0f172a; font-size:1.5rem;">{result['icon']} {result['status']}</h3>
-                                <p style="margin:5px 0 0 0; font-weight:bold; color:#64748b;">{result['permit_type']}</p>
+                                <h3 style="margin:0; color:#0f172a; font-size:1.8rem;">{result['icon']} {result['status']}</h3>
+                                <p style="margin:5px 0 0 0; font-weight:bold; color:#64748b; font-size:1.1rem;">{result['permit_type']}</p>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:0.8rem; color:#94a3b8;">ASSESSMENT ID</div>
+                                <div style="font-size:0.9rem; color:#94a3b8;">ASSESSMENT ID</div>
                                 <div style="font-weight:bold; color:#0f172a;">#LP-{int(time.time())}</div>
                             </div>
                         </div>
-                        <hr style="border-top: 1px solid #e2e8f0; margin: 15px 0;">
+                        <hr style="border-top: 1px solid #e2e8f0; margin: 20px 0;">
                     """, unsafe_allow_html=True)
                     
                     if result['issues']:
                         for issue in result['issues']:
-                            st.markdown(f"<div style='color:#ef4444; margin-bottom:5px;'>• {issue}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='color:#ef4444; margin-bottom:8px; font-size:1.1rem;'>• {issue}</div>", unsafe_allow_html=True)
                     else:
-                        st.markdown(f"<div style='color:#166534; margin-top:5px;'>Configuration meets GML General Access Limits.</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='color:#166534; margin-top:5px; font-size:1.1rem;'>Configuration meets GML General Access Limits.</div>", unsafe_allow_html=True)
                     
                     st.markdown("</div>", unsafe_allow_html=True)
                     st.success("Result logged to Session Audit Log.")
