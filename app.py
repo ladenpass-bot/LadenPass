@@ -14,13 +14,12 @@ st.set_page_config(
 # --- 2. HELPER: LOAD IMAGE CORRECTLY ---
 def get_base64_image(image_path):
     try:
-        # UPDATED: Now looks for 'logo.jpg' specifically
+        # Looks for 'logo.jpg' specifically
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except FileNotFoundError:
         return None
 
-# Load the logo (Updated to match your file)
 logo_b64 = get_base64_image("logo.jpg")
 
 # --- 3. PROFESSIONAL STYLING (CSS) ---
@@ -218,17 +217,15 @@ def check_compliance(gcm, axles, width, height):
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# --- 6. SIDEBAR CONTENT (UPDATED FOR LOGO.JPG) ---
+# --- 6. SIDEBAR CONTENT ---
 with st.sidebar:
     if logo_b64:
-        # NOTE: Updated to 'image/jpeg' to match your file type
         st.markdown(f"""
             <div class="logo-container">
                 <img src="data:image/jpeg;base64,{logo_b64}" style="max-width: 100%; height: auto;">
             </div>
         """, unsafe_allow_html=True)
     else:
-        # Fallback if file is still missing
         st.markdown("""
             <div class="logo-container">
                 <p style="color:#064e3b !important; font-size: 24px; font-weight: bold; margin: 0;">LadenPass</p>
@@ -300,12 +297,22 @@ if not st.session_state.logged_in:
             submitted = st.form_submit_button("Login")
             
             if submitted:
-                if username == "admin" and password == "trucks":
-                    st.session_state.logged_in = True
-                    st.rerun()
-                else:
-                    st.error("Invalid credentials.")
-        
+                # --- [SECURE LOGIN IMPLEMENTATION] ---
+                # This checks for secrets first to prevent crashes if they aren't set up
+                try:
+                    valid_user = st.secrets["credentials"]["username"]
+                    valid_pass = st.secrets["credentials"]["password"]
+                    
+                    if username == valid_user and password == valid_pass:
+                        st.session_state.logged_in = True
+                        st.rerun()
+                    else:
+                        st.error("Invalid credentials.")
+                        
+                except Exception:
+                    st.error("⚠️ Security Config Missing. Please set up secrets.toml or Streamlit Secrets.")
+                    st.info("Instructions: Go to Settings > Secrets and add [credentials] block.")
+
         # SUBSCRIBE BUTTON
         st.markdown("""
             <div class="subscribe-btn-container">
@@ -316,7 +323,7 @@ if not st.session_state.logged_in:
             </div>
         """, unsafe_allow_html=True)
 
-    # --- TRUST BAR (NO LOCAL PRESENCE) ---
+    # --- TRUST BAR ---
     st.markdown("""
     <div class="trust-bar">
         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center;">
@@ -408,16 +415,38 @@ else:
                     
                 st.markdown("</div>", unsafe_allow_html=True)
 
-    # DISCLAIMER & LINKS
-    st.markdown("""
-        <div class="disclaimer">
-            <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on standard General Mass Limits (GML). 
-            Results are estimates only and do not constitute a legal permit. 
-            All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR).
-            <br><br>
-            <div class="footer-links">
-                © 2026 LadenPass Heavy Haulage | <strong>ABN: 16 632 316 240</strong><br>
-                <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
-            </div>
+# --- FOOTER (NOW WITH LEGAL EXPANDERS) ---
+# [Step 2: Legal Implementation] - This section handles the legal text.
+st.markdown("<br><hr>", unsafe_allow_html=True)
+st.markdown("""
+    <div class="disclaimer">
+        <b>Disclaimer:</b> LadenPass provides preliminary feasibility assessments based on standard General Mass Limits (GML). 
+        Results are estimates only and do not constitute a legal permit. 
+        All heavy vehicle movements must be officially lodged and approved by the National Heavy Vehicle Regulator (NHVR).
+        <br><br>
+        <div style="margin-bottom: 20px;">
+            © 2026 LadenPass Heavy Haulage | <strong>ABN: 16 632 316 240</strong>
         </div>
-    """, unsafe_allow_html=True)
+    </div>
+""", unsafe_allow_html=True)
+
+# Legal Expanders (Keeps text hidden until clicked)
+with st.expander("📜 Privacy Policy"):
+    st.write("""
+    **Privacy Policy for LadenPass**
+    
+    1. **Data Collection:** We collect user input (vehicle dimensions) and login credentials for functional purposes only.
+    2. **Usage:** Data is used to calculate compliance checks and is not sold to third parties.
+    3. **Storage:** No vehicle data is permanently stored in this version of the application.
+    4. **Contact:** For privacy concerns, contact the administrator.
+    """)
+
+with st.expander("⚖️ Terms of Service"):
+    st.write("""
+    **Terms of Service**
+    
+    1. **Not Legal Advice:** The outputs of this tool are for estimation only. 
+    2. **NHVR Authority:** Always consult the official NHVR portal before transport.
+    3. **Liability:** LadenPass is not liable for fines incurred based on these calculations.
+    4. **Refunds:** Subscription refunds are handled via Stripe's standard policies (30-day guarantee).
+    """)
