@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="LadenPass | Automated Compliance",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded" # This sets it open, CSS below keeps it open
+    initial_sidebar_state="expanded" 
 )
 
 # --- 2. STATE MANAGEMENT ---
@@ -30,21 +30,22 @@ def get_base64_image(image_path):
 
 logo_b64 = get_base64_image("logo.jpg")
 
-# --- 4. PROFESSIONAL STYLING (WITH SIDEBAR LOCK) ---
+# --- 4. PROFESSIONAL STYLING (FIXED SIDEBAR LOCK) ---
 st.markdown("""
     <style>
-    /* 1. SIDEBAR LOCK (PREVENTS DISAPPEARING) */
-    [data-testid="stSidebar"] {
-        min-width: 320px !important;
-        max-width: 320px !important;
-    }
-    /* Hide the little arrow button that collapses the sidebar */
-    [data-testid="stSidebar"] button[kind="header"] {
+    /* 1. SIDEBAR LOCK - THE "SURGICAL STRIKE" */
+    /* This targets the specific collapse arrow button by its text description */
+    button[aria-label="Collapse sidebar"] {
         display: none !important;
     }
-    /* Hide the expand button in case it somehow collapses */
+    /* Also hide the "Expand" button just in case */
     [data-testid="collapsedControl"] {
         display: none !important;
+    }
+    /* Force sidebar width to stay fixed */
+    [data-testid="stSidebar"] {
+        min-width: 300px !important;
+        max-width: 300px !important;
     }
 
     /* 2. GLOBAL RESET & THEME */
@@ -253,7 +254,7 @@ def check_compliance(gcm, axles, width, height):
     
     return report
 
-# --- 6. SIDEBAR (PROFESSIONAL & LOCKED) ---
+# --- 6. SIDEBAR (LOCKED & PROFESSIONAL) ---
 with st.sidebar:
     # A. LOGO
     if logo_b64:
@@ -280,9 +281,6 @@ with st.sidebar:
         st.markdown("<p style='font-size:0.75rem; color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-top:20px; margin-bottom:10px;'>MENU</p>", unsafe_allow_html=True)
         menu = st.radio("", ["📊 Dashboard", "✅ Run Check"], label_visibility="collapsed")
         
-        # >>> FUTURE ADDITIONS GO HERE <<<
-        # Example: if st.button("⚙️ Settings"): pass
-
         # D. SYSTEM STATUS
         st.markdown("""
         <div class="sidebar-card" style="margin-top:20px;">
